@@ -1,0 +1,16 @@
+aws_region             = "us-east-1"
+app_name               = "wagtail-app"
+vpc_cidr               = "10.0.0.0/16"
+public_subnets         = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnets        = ["10.0.10.0/24", "10.0.11.0/24"]
+availability_zones     = ["us-east-1a", "us-east-1b"]
+db_name                = "myproject"
+db_username            = "postgres"
+db_password            = "change-me-to-secure-password"
+secret_key             = "change-me-to-secure-django-secret-key"
+aws_access_key_id      = "your-aws-access-key-id"
+aws_secret_access_key  = "your-aws-secret-access-key"
+app_image_tag          = "latest"
+domain_name            = "dev.example.com"
+cloudflare_api_token   = "your-cloudflare-api-token"
+cloudflare_zone_id     = "your-cloudflare-zone-id" 
