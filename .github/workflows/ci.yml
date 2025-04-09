@@ -10,6 +10,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    environment: env
     steps:
       - uses: actions/checkout@v4
       
@@ -44,6 +45,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    environment: env
     needs: lint
     services:
       postgres:
@@ -91,6 +93,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    environment: env
     needs: test
     if: github.event_name != 'pull_request'
     
