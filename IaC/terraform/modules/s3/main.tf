@@ -48,7 +48,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "static" {
     id     = "media-lifecycle"
     status = "Enabled"
 
-    filter {}
+   filter {
+    prefix = "logs/"
+  }
 
     transition {
       days          = 30
@@ -77,7 +79,7 @@ resource "aws_s3_bucket_policy" "static" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "PublicReadGetObject"
+        Sid       = "AllowPublicRead"
         Effect    = "Allow"
         Principal = "*"
         Action    = "s3:GetObject"

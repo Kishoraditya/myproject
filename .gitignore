@@ -60,7 +60,9 @@ override.tf.json
 .terraformrc
 terraform.rc
 tfplan
-
+**/terraform.lock.hcl
+*_.terraform.lock.hcl
+*.terraform.lock.hcl
 # Debugging
 .DS_Store
 .idea/
@@ -79,3 +81,5 @@ coverage.xml
 # Docker
 .docker/
 docker-compose.override.yml
+
+myproject\settings\local.py

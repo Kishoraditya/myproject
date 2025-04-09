@@ -18,7 +18,7 @@ terraform {
   }
   
   backend "s3" {
-    bucket = "terraform-state-myproject-dev"
+    bucket = "my-demo-aws-bucket-number456"
     key    = "terraform.tfstate"
     region = "us-east-1"
   }
@@ -81,6 +81,7 @@ module "rds" {
   db_name              = var.db_name
   db_username          = var.db_username
   db_password          = var.db_password
+  db_master_password = var.db_password
   db_instance_class    = "db.t3.micro"  # Free tier eligible
   allocated_storage    = 20
   max_allocated_storage = 100
@@ -106,6 +107,7 @@ module "ecs" {
   domain_name          = var.domain_name
   allowed_hosts        = "${var.domain_name},*.${var.domain_name}"
   aws_region           = var.aws_region
+  acm_certificate_arn = var.acm_certificate_arn
   fargate_cpu          = 256  # 0.25 vCPU - Free tier eligible
   fargate_memory       = 512  # Free tier eligible
 }
@@ -114,8 +116,18 @@ module "ecs" {
 resource "cloudflare_record" "site" {
   zone_id = var.cloudflare_zone_id
   name    = "dev"
-  value   = module.ecs.alb_dns_name
+  content   = module.ecs.alb_dns_name
   type    = "CNAME"
   ttl     = 1
   proxied = true
 } 
+
+resource "cloudflare_record" "apex" {
+  zone_id = var.cloudflare_zone_id
+  name    = "@"           # This represents the root domain (shoshin.world)
+  content = module.ecs.alb_dns_name
+  type    = "CNAME"
+  ttl     = 1
+  proxied = true
+}
+

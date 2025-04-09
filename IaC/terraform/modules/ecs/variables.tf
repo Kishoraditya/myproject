@@ -111,3 +111,9 @@ variable "allowed_hosts" {
   type        = string
   default     = "localhost,127.0.0.1"
 } 
+
+variable "acm_certificate_arn" {
+  description = "The ARN of the ACM certificate covering dev.shoshin.world"
+  type        = string
+}
+

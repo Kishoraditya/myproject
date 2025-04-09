@@ -93,3 +93,8 @@ variable "cloudflare_zone_id" {
   type        = string
   sensitive   = true
 } 
+
+variable "acm_certificate_arn" {
+  description = "The ARN of the ACM certificate to use for the ALB listener"
+  type        = string
+}

@@ -47,3 +47,9 @@ variable "max_allocated_storage" {
   type        = number
   default     = 100
 } 
+
+variable "db_master_password" {
+  description = "The master password for the RDS DB instance"
+  type        = string
+  sensitive   = true
+}

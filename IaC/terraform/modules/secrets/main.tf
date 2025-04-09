@@ -1,5 +1,5 @@
 resource "aws_secretsmanager_secret" "app_secrets" {
-  name        = "${var.environment}/${var.app_name}/secrets"
+  name        = "${var.environment}/${var.app_name}/secrets_3"
   description = "Secrets for the ${var.app_name} application in ${var.environment} environment"
   
   tags = {

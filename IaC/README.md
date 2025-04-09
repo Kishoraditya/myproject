@@ -52,11 +52,17 @@ The project is set up to run on AWS with the following components:
 
 1. Clone the repository
 2. Navigate to the project directory:
-   ```
+
+   ```bash
+
    cd myproject
+
    ```
+
 3. Deploy the infrastructure:
-   ```
+
+   ```bash
+
    cd IaC/terraform/environments/development
    cp terraform.tfvars.example terraform.tfvars
    # Edit terraform.tfvars with your credentials
@@ -79,6 +85,7 @@ The project is configured with GitHub Actions workflows:
 ## Environment Specific Configurations
 
 Each environment (dev, test, pre-prod, prod) has its own:
+
 - Terraform configuration
 - ECR repository
 - ECS cluster
@@ -101,4 +108,4 @@ To customize the infrastructure:
 1. Update terraform modules in `terraform/modules/`
 2. Modify environment-specific configurations in `terraform/environments/`
 3. Update Docker configuration in `docker/`
-4. Adjust CI/CD workflows in `cicd/github-actions/` 
+4. Adjust CI/CD workflows in `cicd/github-actions/` \

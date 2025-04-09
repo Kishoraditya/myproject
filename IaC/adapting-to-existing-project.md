@@ -12,6 +12,7 @@ This guide explains how to adapt the Infrastructure as Code (IaC) folder to an e
 ## Step 1: Copy the IaC Folder
 
 1. Copy the entire `IaC` folder from this project to the root of your existing Wagtail project:
+
    ```bash
    cp -r /path/to/myproject/IaC /path/to/your-project/
    ```
@@ -19,6 +20,7 @@ This guide explains how to adapt the Infrastructure as Code (IaC) folder to an e
 ## Step 2: Update Project Specific Settings
 
 1. Modify the Django app name in Terraform files:
+
    ```bash
    cd /path/to/your-project/IaC/terraform/environments
    # Replace "wagtail-app" with your app name in all tfvars.example files
@@ -35,6 +37,7 @@ This guide explains how to adapt the Infrastructure as Code (IaC) folder to an e
 ## Step 3: Ensure Required Django Settings
 
 1. Make sure your Django settings include AWS S3 configuration:
+
    ```python
    # In your settings.py file for production
    if not DEBUG:
@@ -54,6 +57,7 @@ This guide explains how to adapt the Infrastructure as Code (IaC) folder to an e
    ```
 
 2. Add the health check URL:
+
    ```python
    # In your urls.py
    from django.http import HttpResponse
@@ -68,7 +72,8 @@ This guide explains how to adapt the Infrastructure as Code (IaC) folder to an e
    ```
 
 3. Update your requirements.txt to include:
-   ```
+
+   ```bash
    django-storages
    boto3
    gunicorn
@@ -77,12 +82,14 @@ This guide explains how to adapt the Infrastructure as Code (IaC) folder to an e
 ## Step 4: Adapt Docker Files (if needed)
 
 1. If your project has specific dependencies beyond standard Wagtail, update the Dockerfile:
+
    ```bash
    # Edit the Dockerfile to add your specific system dependencies
    vi IaC/docker/Dockerfile.prod
    ```
 
 2. If your project uses a different entrypoint or command than standard gunicorn, update the CMD:
+
    ```dockerfile
    # Example for a different command
    CMD ["gunicorn", "your_project.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]
@@ -110,6 +117,7 @@ DATABASES = {
 Now follow the standard deployment guide:
 
 1. Set up your credentials:
+
    ```bash
    cp IaC/credentials-example.env IaC/credentials.env
    # Edit credentials.env with your actual values
@@ -117,6 +125,7 @@ Now follow the standard deployment guide:
    ```
 
 2. Deploy to your chosen environment:
+
    ```bash
    cd IaC
    chmod +x deploy.sh
@@ -126,6 +135,7 @@ Now follow the standard deployment guide:
 ## Step 7: Set Up CI/CD in Your Repository
 
 1. Copy the GitHub Actions workflows to your project:
+
    ```bash
    mkdir -p .github/workflows
    cp IaC/cicd/github-actions/*.yml .github/workflows/
@@ -138,4 +148,4 @@ Now follow the standard deployment guide:
 - **Build errors**: Check that your Dockerfile correctly sets up your specific project
 - **Runtime errors**: Check CloudWatch logs for application errors
 - **Database errors**: Verify that your app properly uses the environment variables for database configuration
-- **Static files errors**: Ensure boto3 and django-storages are properly configured 
+- **Static files errors**: Ensure boto3 and django-storages are properly configured

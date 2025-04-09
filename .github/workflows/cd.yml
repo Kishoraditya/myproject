@@ -1,0 +1,140 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+        - development
+        - testing
+        - preproduction
+        - production
+
+jobs:
+  determine_environment:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+    steps:
+      - name: Determine environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+            if [ "${{ github.event.workflow_run.head_branch }}" = "main" ]; then
+              echo "environment=production" >> $GITHUB_OUTPUT
+            else
+              echo "environment=development" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "Workflow run was not successful. Exiting."
+            exit 1
+          fi
+
+  deploy:
+    needs: determine_environment
+    runs-on: ubuntu-latest
+    environment: ${{ needs.determine_environment.outputs.environment }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+      
+      - name: Download Terraform state bucket creation script
+        run: |
+          curl -o create-tf-state-bucket.sh https://raw.githubusercontent.com/hashicorp/terraform-guides/master/operations/scripts/aws/create-tf-state-bucket.sh
+          chmod +x create-tf-state-bucket.sh
+      
+      - name: Create Terraform state bucket if it doesn't exist
+        run: |
+          ENV_NAME=$(echo "${{ needs.determine_environment.outputs.environment }}" | cut -c1-4)
+          ./create-tf-state-bucket.sh -b terraform-state-myproject-$ENV_NAME -r ${{ secrets.AWS_REGION }}
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Set environment specific variables
+        id: env-vars
+        run: |
+          ENV_NAME="${{ needs.determine_environment.outputs.environment }}"
+          SHORT_ENV=$(echo "$ENV_NAME" | cut -c1-4)
+          
+          if [ "$ENV_NAME" = "production" ]; then
+            echo "tf_workspace=prod" >> $GITHUB_OUTPUT
+            echo "image_tag=latest" >> $GITHUB_OUTPUT
+          elif [ "$ENV_NAME" = "preproduction" ]; then
+            echo "tf_workspace=preprod" >> $GITHUB_OUTPUT
+            echo "image_tag=preprod" >> $GITHUB_OUTPUT
+          elif [ "$ENV_NAME" = "testing" ]; then
+            echo "tf_workspace=test" >> $GITHUB_OUTPUT
+            echo "image_tag=test" >> $GITHUB_OUTPUT
+          else
+            echo "tf_workspace=dev" >> $GITHUB_OUTPUT
+            echo "image_tag=develop-latest" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create Terraform variables file
+        run: |
+          cd myproject/IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
+          
+          cat > terraform.tfvars <<EOF
+          aws_region             = "${{ secrets.AWS_REGION }}"
+          app_name               = "wagtail-app"
+          app_image_tag          = "${{ steps.env-vars.outputs.image_tag }}"
+          db_username            = "${{ secrets.DB_USERNAME }}"
+          db_password            = "${{ secrets.DB_PASSWORD }}"
+          secret_key             = "${{ secrets.DJANGO_SECRET_KEY }}"
+          aws_access_key_id      = "${{ secrets.S3_ACCESS_KEY_ID }}"
+          aws_secret_access_key  = "${{ secrets.S3_SECRET_ACCESS_KEY }}"
+          domain_name            = "${{ secrets.DOMAIN_NAME }}"
+          cloudflare_api_token   = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          cloudflare_zone_id     = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
+          EOF
+      
+      - name: Terraform Init
+        run: |
+          cd myproject/IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
+          terraform init
+      
+      - name: Terraform Plan
+        run: |
+          cd myproject/IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
+          terraform plan -out=tfplan
+      
+      - name: Terraform Apply
+        run: |
+          cd myproject/IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
+          terraform apply -auto-approve tfplan
+      
+      - name: Update ECS service
+        run: |
+          ENV_NAME="${{ needs.determine_environment.outputs.environment }}"
+          SHORT_ENV=$(echo "$ENV_NAME" | cut -c1-4)
+          
+          aws ecs update-service --cluster $SHORT_ENV-cluster \
+            --service $SHORT_ENV-wagtail-app \
+            --force-new-deployment 
