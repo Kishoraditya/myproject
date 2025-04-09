@@ -15,6 +15,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . .
 
+# Create the search app configuration if it doesn't exist
+RUN mkdir -p search && \
+    touch search/__init__.py && \
+    echo 'from django.apps import AppConfig\n\nclass SearchConfig(AppConfig):\n    default_auto_field = "django.db.models.BigAutoField"\n    name = "search"' > search/apps.py
+
 # Collect static files
 # Collect static files with error handling
 RUN python -c "import os; os.makedirs('staticfiles', exist_ok=True)" && \
