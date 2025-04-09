@@ -125,3 +125,4 @@ node_modules/
 *.sqlite3-journal
 
 myproject\myproject\settings\local.py
+EOF
