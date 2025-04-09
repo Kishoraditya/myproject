@@ -3,6 +3,7 @@ from wagtail.models.i18n import Locale
 from home.models import HomePage
 from django.test import TestCase
 
+
 class HomePageTests(TestCase):
     def setUp(self):
         # Ensure default locale exists
@@ -11,7 +12,7 @@ class HomePageTests(TestCase):
 
         # Ensure the root page exists
         self.root_page = Page.objects.get_or_create(title="Root", slug="root")[0]
-        
+
         # Create a homepage if it does not exist
         if not HomePage.objects.exists():
             self.home_page = HomePage(title="Home", slug="home")
@@ -29,15 +30,11 @@ class HomePageTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-
 class HomePageModelTests(TestCase):
     def test_homepage_model_fields(self):
         # Create a homepage
-        home_page = HomePage(
-            title="Test Home",
-            body="<p>Test content</p>"
-        )
-        
+        home_page = HomePage(title="Test Home", body="<p>Test content</p>")
+
         # Check field values
         self.assertEqual(home_page.title, "Test Home")
         self.assertEqual(home_page.body, "<p>Test content</p>")
