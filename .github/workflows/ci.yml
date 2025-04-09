@@ -99,7 +99,51 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
+       # Print system resources before build
+      - name: Check system resources
+        run: |
+          echo "=== System Resources ==="
+          free -h
+          df -h
+          echo "=== Process Count ==="
+          ps aux | wc -l
         
+          # Analyze build context size
+      - name: Analyze build context
+        run: |
+          echo "=== Build Context Analysis ==="
+          find . -type f -not -path "*/\.*" | wc -l
+          echo "Total files (excluding hidden): $(find . -type f -not -path "*/\.*" | wc -l)"
+          echo "Total size: $(du -sh . | cut -f1)"
+          echo "Largest directories:"
+          du -h --max-depth=1 . | sort -hr | head -10
+          echo "Largest files:"
+          find . -type f -not -path "*/\.*" -exec du -h {} \; | sort -hr | head -10
+      
+      # Create a minimal .dockerignore
+      - name: Create minimal dockerignore
+        run: |
+          echo "=== Creating minimal .dockerignore ==="
+          cat > .dockerignore << 'EOF'
+          .git
+          .github
+          __pycache__
+          *.pyc
+          *.pyo
+          *.pyd
+          .Python
+          env/
+          venv/
+          .env
+          .venv
+          node_modules/
+          .coverage
+          htmlcov/
+          .tox/
+          .pytest_cache/
+          EOF
+          cat .dockerignore
+  
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         
@@ -128,20 +172,34 @@ jobs:
             echo "IMAGE_TAG=${{ env.BRANCH_NAME }}-$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
           fi
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker
-        
-      - name: List directory structure
-        run: find . -type f -name "Dockerfile*" | sort
+      # Create a minimal build context
+      - name: Create minimal build context
+        run: |
+          echo "=== Creating minimal build context ==="
+          mkdir -p docker-context
+          cp Dockerfile docker-context/
+          cp requirements.txt docker-context/
+          cp -r myproject docker-context/ || echo "No myproject directory"
+          cp -r home docker-context/ || echo "No home directory"
+          cp manage.py docker-context/ || echo "No manage.py file"
+          echo "Context size: $(du -sh docker-context | cut -f1)"
       
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ENV_NAME }}-wagtail-app:${{ env.IMAGE_TAG }}
-          #cache-from: type=gha
-          #cache-to: type=gha,mode=max
+      # Try building with minimal context
+      - name: Build with minimal context
+        run: |
+          echo "=== Building with minimal context ==="
+          cd docker-context
+          docker build -t test-image .
+          echo "Build successful!"
+      
+      # If the minimal build works, try pushing to ECR
+      - name: Push to ECR if minimal build works
+        run: |
+          if [ "$(docker images -q test-image 2> /dev/null)" != "" ]; then
+            echo "=== Pushing to ECR ==="
+            docker tag test-image ${{ steps.login-ecr.outputs.registry }}/${{ env.ENV_NAME }}-wagtail-app:${{ env.IMAGE_TAG }}
+            docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ENV_NAME }}-wagtail-app:${{ env.IMAGE_TAG }}
+          else
+            echo "Minimal build failed, not pushing"
+            exit 1
+          fi
