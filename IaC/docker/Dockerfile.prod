@@ -1,16 +1,13 @@
-FROM python:3.11-slim
+# Build stage
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies for building
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
-
-# Create a non-root user to run the application
-RUN useradd -m appuser && chown -R appuser:appuser /app
-USER appuser
 
 # Use virtual environment
 ENV VIRTUAL_ENV=/app/venv
@@ -18,21 +15,39 @@ RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install Python dependencies
-COPY --chown=appuser:appuser requirements.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt gunicorn
 
-# Copy project
-COPY --chown=appuser:appuser . .
+# Final stage
+FROM python:3.11-slim
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
+WORKDIR /app
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user
+RUN useradd -m appuser && chown -R appuser:appuser /app
+
+# Copy virtual environment from builder
+ENV VIRTUAL_ENV=/app/venv
+COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Copy project files
+COPY --chown=appuser:appuser . .
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Switch to non-root user
+USER appuser
+
 # Expose port for the application
 EXPOSE 8000
 
-# Run gunicorn with proper settings for production
-CMD ["gunicorn", "myproject.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"] 
+# Run gunicorn
+CMD ["gunicorn", "myproject.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]
