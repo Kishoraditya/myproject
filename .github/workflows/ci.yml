@@ -165,7 +165,7 @@ jobs:
       - name: Set environment and tag
         run: |
           if [ "${{ env.BRANCH_NAME }}" = "main" ]; then
-            echo "ENV_NAME=prod" >> $GITHUB_ENV
+            echo "ENV_NAME=dev" >> $GITHUB_ENV
             echo "IMAGE_TAG=latest" >> $GITHUB_ENV
           else
             echo "ENV_NAME=dev" >> $GITHUB_ENV
