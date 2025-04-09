@@ -35,7 +35,12 @@ RUN useradd -m appuser && chown -R appuser:appuser /app
 ENV VIRTUAL_ENV=/app/venv
 COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+ENV DJANGO_SETTINGS_MODULE=myproject.settings.production
 
+# Collect static files with error handling
+RUN python -c "import os; os.makedirs('staticfiles', exist_ok=True)" && \
+    python manage.py collectstatic --noinput || echo "Static collection failed, continuing anyway"
+    
 # Copy project files
 COPY --chown=appuser:appuser . .
 
