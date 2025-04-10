@@ -35,17 +35,21 @@ RUN useradd -m appuser && chown -R appuser:appuser /app
 ENV VIRTUAL_ENV=/app/venv
 COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-ENV DJANGO_SETTINGS_MODULE=myproject.settings.production
+ENV DJANGO_SETTINGS_MODULE=myproject.settings.docker
 
 # Copy project files
 COPY --chown=appuser:appuser . .
 
+# Make empty search directory structure to avoid import errors
+RUN mkdir -p search
+COPY --chown=appuser:appuser IaC/docker/fix_urls.sh /app/fix_urls.sh
+RUN chmod +x /app/fix_urls.sh
+
 # Create the search app configuration if it doesn't exist
-# Modify this section in your Dockerfile.prod
-RUN mkdir -p search && \
-    touch search/__init__.py && \
+RUN touch search/__init__.py && \
     echo 'from django.apps import AppConfig\n\nclass SearchConfig(AppConfig):\n    default_auto_field = "django.db.models.BigAutoField"\n    name = "search"' > search/apps.py && \
-    echo 'from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator\nfrom django.template.response import TemplateResponse\nfrom wagtail.models import Page\n\ndef search(request):\n    search_query = request.GET.get("query", None)\n    page = request.GET.get("page", 1)\n    if search_query:\n        search_results = Page.objects.live().search(search_query)\n    else:\n        search_results = Page.objects.none()\n    paginator = Paginator(search_results, 10)\n    try:\n        search_results = paginator.page(page)\n    except PageNotAnInteger:\n        search_results = paginator.page(1)\n    except EmptyPage:\n        search_results = paginator.page(paginator.num_pages)\n    return TemplateResponse(request, "search/search.html", {"search_query": search_query, "search_results": search_results})' > search/views.py
+    echo 'from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator\nfrom django.template.response import TemplateResponse\nfrom wagtail.models import Page\n\ndef search(request):\n    search_query = request.GET.get("query", None)\n    page = request.GET.get("page", 1)\n    if search_query:\n        search_results = Page.objects.live().search(search_query)\n    else:\n        search_results = Page.objects.none()\n    paginator = Paginator(search_results, 10)\n    try:\n        search_results = paginator.page(page)\n    except PageNotAnInteger:\n        search_results = paginator.page(1)\n    except EmptyPage:\n        search_results = paginator.page(paginator.num_pages)\n    return TemplateResponse(request, "search/search.html", {"search_query": search_query, "search_results": search_results})' > search/views.py && \
+    /app/fix_urls.sh
 
 # Collect static files with error handling
 RUN python -c "import os; os.makedirs('staticfiles', exist_ok=True)" && \
