@@ -80,6 +80,7 @@ jobs:
           DEBUG: "True"
           SECRET_KEY: "testing-secret-key"
           DATABASE_URL: "postgres://postgres:postgres@localhost:5432/myproject_test"
+          DJANGO_SETTINGS_MODULE: myproject.settings
         run: |
           coverage run -m pytest
           coverage report
