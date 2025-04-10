@@ -16,3 +16,16 @@ try:
     from .local import *
 except ImportError:
     pass
+# Add to dev.py
+STATIC_URL = "/static/"
+MEDIA_URL = "/media/"
+
+# File system storage
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    },
+}
