@@ -1,5 +1,17 @@
 from .base import *
 
+# Add this to your test.py file
+STATIC_URL = "/static/"
+
+# Also add a proper STORAGES configuration
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # Use SQLite for testing
 DATABASES = {
