@@ -41,10 +41,11 @@ ENV DJANGO_SETTINGS_MODULE=myproject.settings.production
 COPY --chown=appuser:appuser . .
 
 # Create the search app configuration if it doesn't exist
+# Modify this section in your Dockerfile.prod
 RUN mkdir -p search && \
     touch search/__init__.py && \
-    echo 'from django.apps import AppConfig\n\nclass SearchConfig(AppConfig):\n    default_auto_field = "django.db.models.BigAutoField"\n    name = "search"' > search/apps.py
-
+    echo 'from django.apps import AppConfig\n\nclass SearchConfig(AppConfig):\n    default_auto_field = "django.db.models.BigAutoField"\n    name = "search"' > search/apps.py && \
+    echo 'from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator\nfrom django.template.response import TemplateResponse\nfrom wagtail.models import Page\n\ndef search(request):\n    search_query = request.GET.get("query", None)\n    page = request.GET.get("page", 1)\n    if search_query:\n        search_results = Page.objects.live().search(search_query)\n    else:\n        search_results = Page.objects.none()\n    paginator = Paginator(search_results, 10)\n    try:\n        search_results = paginator.page(page)\n    except PageNotAnInteger:\n        search_results = paginator.page(1)\n    except EmptyPage:\n        search_results = paginator.page(paginator.num_pages)\n    return TemplateResponse(request, "search/search.html", {"search_query": search_query, "search_results": search_results})' > search/views.py
 
 # Collect static files with error handling
 RUN python -c "import os; os.makedirs('staticfiles', exist_ok=True)" && \
