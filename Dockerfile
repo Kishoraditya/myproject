@@ -34,6 +34,13 @@ RUN mkdir -p search && \
 # Collect static files with error handling
 RUN python -c "import os; os.makedirs('staticfiles', exist_ok=True)" && \
     python manage.py collectstatic --noinput || echo "Static collection failed, continuing anyway"
+
+# Make entrypoint script executable
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
+# Use the entrypoint script
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
     
 # Run gunicorn
 CMD ["gunicorn", "myproject.wsgi:application", "--bind", "0.0.0.0:8000"]

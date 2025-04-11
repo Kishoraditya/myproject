@@ -6,12 +6,14 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
 from search.views import search
+from myproject.health import health_check
 
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search, name="search"),
+    path("health/", health_check, name="health_check"),
 ]
 
 
