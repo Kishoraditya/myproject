@@ -35,9 +35,9 @@ RUN mkdir -p search && \
 RUN python -c "import os; os.makedirs('staticfiles', exist_ok=True)" && \
     python manage.py collectstatic --noinput || echo "Static collection failed, continuing anyway"
 
-# Make entrypoint script executable
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
-RUN chmod +x /app/docker-entrypoint.sh
+# Create entrypoint script
+RUN echo '#!/bin/bash\nset -e\n\necho "Waiting for database to be ready..."\n# Give the database some time to start up\nsleep 5\n\necho "Running database migrations..."\npython manage.py migrate --noinput\n\necho "Creating cache tables..."\npython manage.py createcachetable\n\necho "Starting application server..."\nexec "$@"' > /app/docker-entrypoint.sh && \
+    chmod +x /app/docker-entrypoint.sh
 
 # Use the entrypoint script
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
