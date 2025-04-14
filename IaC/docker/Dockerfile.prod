@@ -16,6 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV DJANGO_SETTINGS_MODULE=myproject.settings.docker
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV CSRF_TRUSTED_ORIGINS=http://localhost:8000
 
 # Copy project
 COPY . .
@@ -31,9 +32,9 @@ RUN mkdir -p search && \
     echo 'from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator\nfrom django.template.response import TemplateResponse\nfrom wagtail.models import Page\n\ndef search(request):\n    search_query = request.GET.get("query", None)\n    page = request.GET.get("page", 1)\n    if search_query:\n        search_results = Page.objects.live().search(search_query)\n    else:\n        search_results = Page.objects.none()\n    paginator = Paginator(search_results, 10)\n    try:\n        search_results = paginator.page(page)\n    except PageNotAnInteger:\n        search_results = paginator.page(1)\n    except EmptyPage:\n        search_results = paginator.page(paginator.num_pages)\n    return TemplateResponse(request, "search/search.html", {"search_query": search_query, "search_results": search_results})' > search/views.py && \
     /app/fix_urls.sh
 
-# Collect static files with error handling
-RUN python -c "import os; os.makedirs('staticfiles', exist_ok=True)" && \
-    python manage.py collectstatic --noinput || echo "Static collection failed, continuing anyway"
+# Create static files directory and collect static files
+RUN mkdir -p /app/staticfiles && \
+    python manage.py collectstatic --noinput
 
 # Create entrypoint script
 RUN echo '#!/bin/bash\nset -e\n\necho "Waiting for database to be ready..."\n# Give the database some time to start up\nsleep 5\n\necho "Running database migrations..."\npython manage.py migrate --noinput\n\necho "Creating cache tables..."\npython manage.py createcachetable\n\necho "Starting application server..."\nexec "$@"' > /app/docker-entrypoint.sh && \
@@ -42,5 +43,5 @@ RUN echo '#!/bin/bash\nset -e\n\necho "Waiting for database to be ready..."\n# G
 # Use the entrypoint script
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
     
-# Run gunicorn
-CMD ["gunicorn", "myproject.wsgi:application", "--bind", "0.0.0.0:8000"]
+# Run gunicorn with static files serving
+CMD ["gunicorn", "myproject.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]

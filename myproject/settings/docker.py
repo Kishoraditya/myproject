@@ -22,4 +22,4 @@ ALLOWED_HOSTS = ["*"]
 # Security settings for Docker (less strict)
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False 
+CSRF_COOKIE_SECURE = False
