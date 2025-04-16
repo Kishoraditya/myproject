@@ -69,7 +69,7 @@ jobs:
           terraform_version: 1.5.7
       
       - name: Make Terraform state bucket script executable
-        run: chmod +x myproject/IaC/scripts/create-tf-state-bucket.sh
+        run: chmod +x IaC/scripts/create-tf-state-bucket.sh
       
       - name: Create Terraform state bucket if it doesn't exist
         run: |
