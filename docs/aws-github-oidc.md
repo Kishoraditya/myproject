@@ -44,7 +44,10 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "ecr:InitiateLayerUpload",
                 "ecr:UploadLayerPart",
                 "ecr:CompleteLayerUpload",
-                "ecr:PutImage"
+                "ecr:PutImage",
+                "ecr:CreateRepository",
+                "ecr:DescribeRepositories",
+                "ecr:DeleteRepository"
             ],
             "Resource": "*"
         },
@@ -58,7 +61,9 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "ecs:RegisterTaskDefinition",
                 "ecs:DeregisterTaskDefinition",
                 "ecs:DescribeTaskDefinition",
-                "ecs:DescribeClusters"
+                "ecs:DescribeClusters",
+                "ecs:CreateCluster",
+                "ecs:DeleteCluster"
             ],
             "Resource": "*"
         },
@@ -81,7 +86,9 @@ Instead of attaching multiple managed policies that may exceed the limit, create
             ],
             "Resource": [
                 "arn:aws:s3:::terraform-state-myproject-*",
-                "arn:aws:s3:::terraform-state-myproject-*/*"
+                "arn:aws:s3:::terraform-state-myproject-*/*",
+                "arn:aws:s3:::*-wagtail-app-static",
+                "arn:aws:s3:::*-wagtail-app-static/*"
             ]
         },
         {
@@ -105,7 +112,10 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "rds:DescribeDBInstances",
                 "rds:CreateDBSubnetGroup",
                 "rds:DeleteDBSubnetGroup",
-                "rds:DescribeDBSubnetGroups"
+                "rds:DescribeDBSubnetGroups",
+                "rds:CreateDBParameterGroup",
+                "rds:DeleteDBParameterGroup",
+                "rds:ModifyDBParameterGroup"
             ],
             "Resource": "*"
         },
@@ -118,7 +128,24 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "ec2:CreateSecurityGroup",
                 "ec2:DeleteSecurityGroup",
                 "ec2:AuthorizeSecurityGroupIngress",
-                "ec2:RevokeSecurityGroupIngress"
+                "ec2:RevokeSecurityGroupIngress",
+                "ec2:CreateVpc",
+                "ec2:DeleteVpc",
+                "ec2:CreateSubnet",
+                "ec2:DeleteSubnet",
+                "ec2:CreateRoute",
+                "ec2:DeleteRoute",
+                "ec2:CreateRouteTable",
+                "ec2:DeleteRouteTable",
+                "ec2:AssociateRouteTable",
+                "ec2:DisassociateRouteTable",
+                "ec2:CreateInternetGateway",
+                "ec2:DeleteInternetGateway",
+                "ec2:AttachInternetGateway",
+                "ec2:DetachInternetGateway",
+                "ec2:AllocateAddress",
+                "ec2:ReleaseAddress",
+                "ec2:CreateTags"
             ],
             "Resource": "*"
         },
@@ -133,7 +160,55 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "elasticloadbalancing:DeleteTargetGroup",
                 "elasticloadbalancing:DescribeTargetGroups",
                 "elasticloadbalancing:CreateRule",
-                "elasticloadbalancing:DeleteRule"
+                "elasticloadbalancing:DeleteRule",
+                "elasticloadbalancing:CreateListener",
+                "elasticloadbalancing:DeleteListener"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:DeleteLogGroup",
+                "logs:PutRetentionPolicy",
+                "logs:DescribeLogGroups"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "acm:RequestCertificate",
+                "acm:DeleteCertificate",
+                "acm:DescribeCertificate",
+                "acm:AddTagsToCertificate"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:GetRole",
+                "iam:PassRole",
+                "iam:AttachRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:PutRolePolicy",
+                "iam:DeleteRolePolicy"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:CreateSecret",
+                "secretsmanager:DeleteSecret",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:PutSecretValue",
+                "secretsmanager:UpdateSecret",
+                "secretsmanager:TagResource"
             ],
             "Resource": "*"
         }
