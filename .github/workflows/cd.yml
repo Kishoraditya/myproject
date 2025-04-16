@@ -104,19 +104,39 @@ jobs:
         run: |
           cd IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
           
+          # Prepare secrets - strip any newlines and escape special characters
+          DOMAIN_NAME=$(echo '${{ secrets.DOMAIN_NAME }}' | tr -d '\n\r')
+          DB_USERNAME=$(echo '${{ secrets.DB_USERNAME }}' | tr -d '\n\r')
+          DB_PASSWORD=$(echo '${{ secrets.DB_PASSWORD }}' | tr -d '\n\r')
+          SECRET_KEY=$(echo '${{ secrets.DJANGO_SECRET_KEY }}' | tr -d '\n\r')
+          S3_ACCESS_KEY=$(echo '${{ secrets.S3_ACCESS_KEY_ID }}' | tr -d '\n\r')
+          S3_SECRET_KEY=$(echo '${{ secrets.S3_SECRET_ACCESS_KEY }}' | tr -d '\n\r')
+          CF_TOKEN=$(echo '${{ secrets.CLOUDFLARE_API_TOKEN }}' | tr -d '\n\r')
+          CF_ZONE_ID=$(echo '${{ secrets.CLOUDFLARE_ZONE_ID }}' | tr -d '\n\r')
+          
+          # Create terraform.tfvars file with properly sanitized values
           cat > terraform.tfvars <<EOF
           aws_region             = "us-east-1"
           app_name               = "wagtail-app"
           app_image_tag          = "${{ steps.env-vars.outputs.image_tag }}"
-          db_username            = "${{ secrets.DB_USERNAME }}"
-          db_password            = "${{ secrets.DB_PASSWORD }}"
-          secret_key             = "${{ secrets.DJANGO_SECRET_KEY }}"
-          aws_access_key_id      = "${{ secrets.S3_ACCESS_KEY_ID }}"
-          aws_secret_access_key  = "${{ secrets.S3_SECRET_ACCESS_KEY }}"
-          domain_name            = "${{ secrets.DOMAIN_NAME }}"
-          cloudflare_api_token   = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
-          cloudflare_zone_id     = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
+          db_username            = "${DB_USERNAME}"
+          db_password            = "${DB_PASSWORD}"
+          secret_key             = "${SECRET_KEY}"
+          aws_access_key_id      = "${S3_ACCESS_KEY}"
+          aws_secret_access_key  = "${S3_SECRET_KEY}"
+          domain_name            = "${DOMAIN_NAME}"
+          cloudflare_api_token   = "${CF_TOKEN}"
+          cloudflare_zone_id     = "${CF_ZONE_ID}"
           EOF
+          
+          # Verify the file is valid Terraform syntax
+          echo "Validating terraform.tfvars format..."
+          terraform fmt -check terraform.tfvars || {
+            echo "Warning: terraform.tfvars might have formatting issues."
+            # Display file without secrets
+            echo "File structure:"
+            grep -v "password\|key\|token" terraform.tfvars
+          }
       
       - name: Terraform Init
         run: |
