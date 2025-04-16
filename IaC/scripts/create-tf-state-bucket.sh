@@ -3,6 +3,7 @@
 # Script to create an S3 bucket for Terraform state if it doesn't exist
 # Usage: ./create-tf-state-bucket.sh -b bucket-name -r region
 
+# Exit on command errors, but allow specific commands to fail
 set -e
 
 # Default values
@@ -52,11 +53,18 @@ else
     aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION" --create-bucket-configuration LocationConstraint="$REGION"
   fi
   
-  # Enable versioning
-  aws s3api put-bucket-versioning --bucket "$BUCKET_NAME" --versioning-configuration Status=Enabled
+  # Try to enable versioning, but continue if it fails
+  echo "Attempting to enable versioning..."
+  if aws s3api put-bucket-versioning --bucket "$BUCKET_NAME" --versioning-configuration Status=Enabled; then
+    echo "Versioning enabled."
+  else
+    echo "Warning: Could not enable versioning. This may be due to IAM permissions."
+    echo "Continuing without enabling versioning..."
+  fi
   
-  # Enable encryption
-  aws s3api put-bucket-encryption --bucket "$BUCKET_NAME" --server-side-encryption-configuration '{
+  # Try to enable encryption, but continue if it fails
+  echo "Attempting to enable encryption..."
+  if aws s3api put-bucket-encryption --bucket "$BUCKET_NAME" --server-side-encryption-configuration '{
     "Rules": [
       {
         "ApplyServerSideEncryptionByDefault": {
@@ -64,17 +72,30 @@ else
         }
       }
     ]
-  }'
+  }'; then
+    echo "Encryption enabled."
+  else
+    echo "Warning: Could not enable encryption. This may be due to IAM permissions."
+    echo "Continuing without enabling encryption..."
+  fi
   
-  # Block public access
-  aws s3api put-public-access-block --bucket "$BUCKET_NAME" --public-access-block-configuration '{
+  # Try to block public access, but continue if it fails
+  echo "Attempting to block public access..."
+  if aws s3api put-public-access-block --bucket "$BUCKET_NAME" --public-access-block-configuration '{
     "BlockPublicAcls": true,
     "IgnorePublicAcls": true,
     "BlockPublicPolicy": true,
     "RestrictPublicBuckets": true
-  }'
+  }'; then
+    echo "Public access blocked."
+  else
+    echo "Warning: Could not block public access. This may be due to IAM permissions."
+    echo "Continuing without blocking public access..."
+  fi
   
-  echo "Bucket created with versioning, encryption, and public access blocked"
+  echo "Bucket created with best-effort security settings."
 fi
 
-echo "S3 bucket setup complete: $BUCKET_NAME" 
+echo "S3 bucket setup complete: $BUCKET_NAME"
+echo "NOTE: If any warnings appeared above, you may need to manually configure some bucket settings."
+echo "      or update the IAM permissions for this role." 

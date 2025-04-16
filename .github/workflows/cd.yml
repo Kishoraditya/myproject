@@ -87,22 +87,22 @@ jobs:
           SHORT_ENV=$(echo "$ENV_NAME" | cut -c1-4)
           
           if [ "$ENV_NAME" = "production" ]; then
-            echo "tf_workspace=prod" >> $GITHUB_OUTPUT
+            echo "tf_workspace=production" >> $GITHUB_OUTPUT
             echo "image_tag=latest" >> $GITHUB_OUTPUT
           elif [ "$ENV_NAME" = "preproduction" ]; then
-            echo "tf_workspace=preprod" >> $GITHUB_OUTPUT
+            echo "tf_workspace=preproduction" >> $GITHUB_OUTPUT
             echo "image_tag=preprod" >> $GITHUB_OUTPUT
           elif [ "$ENV_NAME" = "testing" ]; then
-            echo "tf_workspace=test" >> $GITHUB_OUTPUT
+            echo "tf_workspace=testing" >> $GITHUB_OUTPUT
             echo "image_tag=test" >> $GITHUB_OUTPUT
           else
-            echo "tf_workspace=dev" >> $GITHUB_OUTPUT
+            echo "tf_workspace=development" >> $GITHUB_OUTPUT
             echo "image_tag=develop-latest" >> $GITHUB_OUTPUT
           fi
       
       - name: Create Terraform variables file
         run: |
-          cd myproject/IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
+          cd IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
           
           cat > terraform.tfvars <<EOF
           aws_region             = "us-east-1"
@@ -120,17 +120,17 @@ jobs:
       
       - name: Terraform Init
         run: |
-          cd myproject/IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
+          cd IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
           terraform init
       
       - name: Terraform Plan
         run: |
-          cd myproject/IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
+          cd IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
           terraform plan -out=tfplan
       
       - name: Terraform Apply
         run: |
-          cd myproject/IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
+          cd IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
           terraform apply -auto-approve tfplan
       
       - name: Update ECS service

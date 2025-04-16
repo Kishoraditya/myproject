@@ -69,7 +69,15 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "s3:GetObject",
                 "s3:PutObject",
                 "s3:DeleteObject",
-                "s3:CreateBucket"
+                "s3:CreateBucket",
+                "s3:PutBucketVersioning",
+                "s3:PutBucketEncryption",
+                "s3:PutBucketPublicAccessBlock",
+                "s3:GetEncryptionConfiguration",
+                "s3:GetBucketVersioning",
+                "s3:GetBucketPolicy",
+                "s3:PutBucketPolicy",
+                "s3:GetBucketPolicyStatus"
             ],
             "Resource": [
                 "arn:aws:s3:::terraform-state-myproject-*",
