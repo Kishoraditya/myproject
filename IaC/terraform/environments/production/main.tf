@@ -106,6 +106,7 @@ module "ecs" {
   domain_name          = var.domain_name
   allowed_hosts        = "${var.domain_name},*.${var.domain_name}"
   aws_region           = var.aws_region
+  acm_certificate_arn  = var.acm_certificate_arn
   fargate_cpu          = 512  # 0.5 vCPU - Better for production
   fargate_memory       = 1024 # 1GB memory - Better for production
   app_count            = 2    # Multiple instances for redundancy
