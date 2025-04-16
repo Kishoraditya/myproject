@@ -60,3 +60,40 @@ python manage.py createsuperuser
 
 ```bash
 python manage.py runserver
+
+```
+
+# Testing Infrastructure
+
+The project includes a robust testing infrastructure to ensure code quality and functionality. Key features:
+
+## Enhanced Test Runner
+
+A custom test runner (`run_tests.py` and `run_tests.bat`) is provided to ensure proper Django initialization and avoid common issues like `AppRegistryNotReady` errors. Use these scripts instead of running pytest directly:
+
+```bash
+# Run all tests
+python run_tests.py
+
+# Run specific tests
+python run_tests.py home/test_models.py::test_homepage_creation
+```
+
+## Mockable Search
+
+The search functionality has been refactored to be easily mockable in tests, avoiding database-related issues with search indexes. See `search/test_views.py` for examples of how to test search functionality without relying on actual search backends.
+
+## Django Ready Fixture
+
+A `django_ready` fixture is automatically applied to all tests to ensure Django is fully initialized before tests run. This prevents common initialization issues when importing models.
+
+## Test Settings
+
+The `myproject/settings/test.py` file contains test-specific settings like:
+
+- In-memory SQLite database for faster tests
+- Disabled migrations for better performance
+- MD5 password hasher for speed
+- In-memory file storage
+
+See `docs/testing.md` for more detailed documentation on the testing infrastructure.

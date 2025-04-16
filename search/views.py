@@ -10,21 +10,24 @@ from wagtail.models import Page
 # from wagtail.contrib.search_promotions.models import Query
 
 
+def _perform_search(search_query):
+    """Helper function to perform the search, making it easier to mock in tests."""
+    if search_query:
+        return Page.objects.live().search(search_query)
+    return Page.objects.none()
+
+
 def search(request):
-    search_query = request.GET.get("query", None)
+    search_query = request.GET.get("query", "")
     page = request.GET.get("page", 1)
 
     # Search
-    if search_query:
-        search_results = Page.objects.live().search(search_query)
+    search_results = _perform_search(search_query)
 
-        # To log this query for use with the "Promoted search results" module:
-
-        # query = Query.get(search_query)
-        # query.add_hit()
-
-    else:
-        search_results = Page.objects.none()
+    # To log this query for use with the "Promoted search results" module:
+    # if search_query:
+    #     query = Query.get(search_query)
+    #     query.add_hit()
 
     # Pagination
     paginator = Paginator(search_results, 10)

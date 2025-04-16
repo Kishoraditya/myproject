@@ -1,61 +1,24 @@
-from .base import *
+"""
+Test settings configuration - extends dev settings but disables migrations
+"""
+import os  # Add explicit import
 
-# Add this to your test.py file
-STATIC_URL = "/static/"
+from django.db import connection  # Move import to top
 
-# Also add a proper STORAGES configuration
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
+from .dev import *  # noqa
 
-# Ensure all required apps are explicitly included
-INSTALLED_APPS = [
-    "home",
-    "search",
-    "wagtail.contrib.forms",
-    "wagtail.contrib.redirects",
-    "wagtail.embeds",
-    "wagtail.sites",
-    "wagtail.users",
-    "wagtail.snippets",
-    "wagtail.documents",
-    "wagtail.images",
-    "wagtail.search",
-    "wagtail.admin",
-    "wagtail",
-    "modelcluster",
-    "taggit",
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-]
-
-# Use SQLite for testing
+# Use in-memory SQLite database for testing
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "NAME": ":memory:",
     }
 }
 
-# Turn on debug for testing
-DEBUG = True
+# Disable migrations by replacing the migration module with a dummy one
+# This significantly speeds up tests
 
-# Make password hashers faster for testing
-PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.MD5PasswordHasher",
-]
-# STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
-# Disable migrations for tests
 class DisableMigrations:
     def __contains__(self, item):
         return True
@@ -65,3 +28,43 @@ class DisableMigrations:
 
 
 MIGRATION_MODULES = DisableMigrations()
+
+# Use a faster password hasher for testing
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.MD5PasswordHasher",
+]
+
+# Remove any conflicting storage settings
+if "STATICFILES_STORAGE" in locals():
+    del STATICFILES_STORAGE
+
+if "STORAGES" in locals():
+    del STORAGES
+
+# Set up test file storage
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.InMemoryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "test-media")  # noqa
+STATIC_ROOT = os.path.join(BASE_DIR, "test-static")  # noqa
+
+
+def setup_sqlite_fts():
+    """Setup SQLite FTS tables after database creation."""
+    if connection.vendor == "sqlite":
+        with connection.cursor() as cursor:
+            # Create FTS tables manually
+            cursor.execute(
+                "CREATE VIRTUAL TABLE IF NOT EXISTS wagtailsearch_indexentry_fts "
+                'USING FTS5(autocomplete, title, body, content="wagtailsearch_indexentry")'
+            )
+
+
+# Call this when DB is ready
+setup_sqlite_fts()

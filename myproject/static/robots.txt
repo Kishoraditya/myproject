@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Disallow admin URLs
+Disallow: /admin/
+Disallow: /django-admin/
+
+# Disallow search results
+Disallow: /search/
+
+# Sitemap
+Sitemap: https://www.shoshinai.com/sitemap.xml 

@@ -1,0 +1,17 @@
+{% load wagtailimages_tags %}
+
+<div class="text-center">
+    {% if value.logo %}
+        <div class="mb-4">
+            {% image value.logo width-150 class="h-16 w-auto mx-auto" %}
+        </div>
+    {% else %}
+        <div class="w-32 h-16 bg-gray-200 rounded flex items-center justify-center mb-4 mx-auto">
+            <span class="text-gray-500 font-medium">{{ value.name }}</span>
+        </div>
+    {% endif %}
+    <p class="font-medium">{{ value.name }}</p>
+    {% if value.url %}
+        <a href="{{ value.url }}" class="text-primary hover:underline text-sm" target="_blank" rel="noopener">Visit Website</a>
+    {% endif %}
+</div> 

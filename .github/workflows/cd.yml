@@ -54,9 +54,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: us-east-1  # Specify a default region
+          audience: sts.amazonaws.com
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -71,7 +71,7 @@ jobs:
       - name: Create Terraform state bucket if it doesn't exist
         run: |
           ENV_NAME=$(echo "${{ needs.determine_environment.outputs.environment }}" | cut -c1-4)
-          ./create-tf-state-bucket.sh -b terraform-state-myproject-$ENV_NAME -r ${{ secrets.AWS_REGION }}
+          ./create-tf-state-bucket.sh -b terraform-state-myproject-$ENV_NAME -r us-east-1
       
       - name: Login to Amazon ECR
         id: login-ecr
@@ -102,7 +102,7 @@ jobs:
           cd myproject/IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
           
           cat > terraform.tfvars <<EOF
-          aws_region             = "${{ secrets.AWS_REGION }}"
+          aws_region             = "us-east-1"
           app_name               = "wagtail-app"
           app_image_tag          = "${{ steps.env-vars.outputs.image_tag }}"
           db_username            = "${{ secrets.DB_USERNAME }}"
