@@ -81,6 +81,7 @@ module "rds" {
   db_name              = var.db_name
   db_username          = var.db_username
   db_password          = var.db_password
+  db_master_password   = var.db_password
   db_instance_class    = "db.t3.small"  # Higher tier for production
   allocated_storage    = 30
   max_allocated_storage = 100
