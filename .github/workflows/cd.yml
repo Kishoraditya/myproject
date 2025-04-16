@@ -68,15 +68,13 @@ jobs:
         with:
           terraform_version: 1.5.7
       
-      - name: Download Terraform state bucket creation script
-        run: |
-          curl -o create-tf-state-bucket.sh https://raw.githubusercontent.com/hashicorp/terraform-guides/master/operations/scripts/aws/create-tf-state-bucket.sh
-          chmod +x create-tf-state-bucket.sh
+      - name: Make Terraform state bucket script executable
+        run: chmod +x myproject/IaC/scripts/create-tf-state-bucket.sh
       
       - name: Create Terraform state bucket if it doesn't exist
         run: |
           ENV_NAME=$(echo "${{ needs.determine_environment.outputs.environment }}" | cut -c1-4)
-          ./create-tf-state-bucket.sh -b terraform-state-myproject-$ENV_NAME -r us-east-1
+          ./myproject/IaC/scripts/create-tf-state-bucket.sh -b terraform-state-myproject-$ENV_NAME -r us-east-1
       
       - name: Login to Amazon ECR
         id: login-ecr
