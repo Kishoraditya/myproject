@@ -113,6 +113,7 @@ jobs:
           S3_SECRET_KEY=$(echo '${{ secrets.S3_SECRET_ACCESS_KEY }}' | tr -d '\n\r')
           CF_TOKEN=$(echo '${{ secrets.CLOUDFLARE_API_TOKEN }}' | tr -d '\n\r')
           CF_ZONE_ID=$(echo '${{ secrets.CLOUDFLARE_ZONE_ID }}' | tr -d '\n\r')
+          ACM_CERT_ARN=$(echo '${{ secrets.ACM_CERTIFICATE_ARN }}' | tr -d '\n\r')
           
           # Create terraform.tfvars file with properly sanitized values
           cat > terraform.tfvars <<EOF
@@ -127,6 +128,7 @@ jobs:
           domain_name            = "${DOMAIN_NAME}"
           cloudflare_api_token   = "${CF_TOKEN}"
           cloudflare_zone_id     = "${CF_ZONE_ID}"
+          acm_certificate_arn    = "${ACM_CERT_ARN}"
           EOF
           
           # Verify the file is valid Terraform syntax
@@ -135,7 +137,7 @@ jobs:
             echo "Warning: terraform.tfvars might have formatting issues."
             # Display file without secrets
             echo "File structure:"
-            grep -v "password\|key\|token" terraform.tfvars
+            grep -v "password\|key\|token\|arn" terraform.tfvars
           }
       
       - name: Terraform Init

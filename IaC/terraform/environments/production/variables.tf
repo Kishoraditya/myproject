@@ -92,4 +92,10 @@ variable "cloudflare_zone_id" {
   description = "Cloudflare Zone ID"
   type        = string
   sensitive   = true
+}
+
+variable "acm_certificate_arn" {
+  description = "The ARN of the ACM certificate for HTTPS"
+  type        = string
+  sensitive   = true
 } 
