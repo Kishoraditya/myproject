@@ -21,6 +21,11 @@ on:
         - preproduction
         - production
 
+# Add permissions needed for OIDC
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   determine_environment:
     runs-on: ubuntu-latest
