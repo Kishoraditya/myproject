@@ -19,7 +19,7 @@ resource "aws_secretsmanager_secret" "app_secrets" {
   lifecycle {
     create_before_destroy = true
   }
-  depends_on = [time_sleep.wait_for_secret_slot]
+  depends_on = [time_sleep.wait_for_secret_replacement]
 }
 
 resource "aws_secretsmanager_secret_version" "app_secrets" {
