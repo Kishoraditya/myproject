@@ -30,5 +30,6 @@ resource "aws_secretsmanager_secret_version" "app_secrets" {
     DB_PASSWORD           = var.db_password
     AWS_ACCESS_KEY_ID     = var.aws_access_key_id
     AWS_SECRET_ACCESS_KEY = var.aws_secret_access_key
+    SUPERUSER_PASSWORD    = var.superuser_password
   })
 }

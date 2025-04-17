@@ -32,7 +32,7 @@ resource "aws_ecs_task_definition" "app" {
 
   container_definitions = jsonencode([
     {
-      name         = var.app_name
+      name         = "${var.environment}-${var.app_name}"
       image        = "${var.ecr_repository_url}:${var.app_image_tag}"
       essential    = true
       portMappings = [
@@ -48,14 +48,17 @@ resource "aws_ecs_task_definition" "app" {
         { name = "DB_NAME", value = var.db_name },
         { name = "AWS_STORAGE_BUCKET_NAME", value = var.s3_bucket_name },
         { name = "AWS_S3_REGION_NAME", value = var.aws_region },
-        { name = "ALLOWED_HOSTS", value = var.allowed_hosts }
+        { name = "ALLOWED_HOSTS", value = var.allowed_hosts },
+        { name  = "SUPERUSER_USERNAME", value = var.superuser_username },
+        { name  = "SUPERUSER_EMAIL", value = var.superuser_email },
       ]
       secrets = [
         { name = "SECRET_KEY", valueFrom = "${var.secrets_arn}:SECRET_KEY::" },
         { name = "DB_USER", valueFrom = "${var.secrets_arn}:DB_USER::" },
         { name = "DB_PASSWORD", valueFrom = "${var.secrets_arn}:DB_PASSWORD::" },
         { name = "AWS_ACCESS_KEY_ID", valueFrom = "${var.secrets_arn}:AWS_ACCESS_KEY_ID::" },
-        { name = "AWS_SECRET_ACCESS_KEY", valueFrom = "${var.secrets_arn}:AWS_SECRET_ACCESS_KEY::" }
+        { name = "AWS_SECRET_ACCESS_KEY", valueFrom = "${var.secrets_arn}:AWS_SECRET_ACCESS_KEY::" },
+        { name = "SUPERUSER_PASSWORD", valueFrom = "${var.secrets_arn}:SUPERUSER_PASSWORD::"},
       ]
       logConfiguration = {
         logDriver = "awslogs"
