@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV DJANGO_SETTINGS_MODULE=myproject.settings.docker
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV CSRF_TRUSTED_ORIGINS=http://localhost:8000
+#ENV CSRF_TRUSTED_ORIGINS=http://localhost:8000
 
 # Copy project
 COPY . .
@@ -36,9 +36,9 @@ RUN mkdir -p search && \
 RUN mkdir -p /app/staticfiles && \
     python manage.py collectstatic --noinput
 
-# Create entrypoint script
-RUN echo '#!/bin/bash\nset -e\n\necho "Waiting for database to be ready..."\n# Give the database some time to start up\nsleep 5\n\necho "Running database migrations..."\npython manage.py migrate --noinput\n\necho "Creating cache tables..."\npython manage.py createcachetable\n\necho "Starting application server..."\nexec "$@"' > /app/docker-entrypoint.sh && \
-    chmod +x /app/docker-entrypoint.sh
+# Create entrypoint script with CSRF configuration and superuser creation
+RUN echo '#!/bin/bash\nset -e\n\necho "Waiting for database to be ready..."\n# Give the database some time to start up\nsleep 5\n\necho "Running database migrations..."\npython manage.py migrate --noinput\n\necho "Creating cache tables..."\npython manage.py createcachetable\n\n# Set CSRF_TRUSTED_ORIGINS based on ALLOWED_HOSTS\nif [ -n "$ALLOWED_HOSTS" ]; then\n  HOSTS=$(echo $ALLOWED_HOSTS | tr "," " ")\n  CSRF_ORIGINS=""\n  for HOST in $HOSTS; do\n    if [ -n "$CSRF_ORIGINS" ]; then\n      CSRF_ORIGINS="$CSRF_ORIGINS,https://$HOST,http://$HOST"\n    else\n      CSRF_ORIGINS="https://$HOST,http://$HOST"\n    fi\n  done\n  export CSRF_TRUSTED_ORIGINS=$CSRF_ORIGINS\n  echo "CSRF_TRUSTED_ORIGINS set to: $CSRF_TRUSTED_ORIGINS"\nfi\n\n# Create superuser if environment variables are set\nif [ -n "$SUPERUSER_USERNAME" ] && [ -n "$SUPERUSER_PASSWORD" ] && [ -n "$SUPERUSER_EMAIL" ]; then\n  echo "Creating/updating superuser..."\n  python -c "import os; from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username=\"$SUPERUSER_USERNAME\").delete(); User.objects.create_superuser(\"$SUPERUSER_USERNAME\", \"$SUPERUSER_EMAIL\", \"$SUPERUSER_PASSWORD\")"\n  echo "Superuser created/updated successfully"\nfi\n\necho "Starting application server..."\nexec "$@"' > /app/docker-entrypoint.sh && \
+chmod +x /app/docker-entrypoint.sh
 
 # Use the entrypoint script
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

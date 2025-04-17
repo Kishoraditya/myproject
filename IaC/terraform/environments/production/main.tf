@@ -69,6 +69,7 @@ module "secrets" {
   db_password           = var.db_password
   aws_access_key_id     = var.aws_access_key_id
   aws_secret_access_key = var.aws_secret_access_key
+  superuser_password    = var.superuser_password
 }
 
 # RDS Database
@@ -111,6 +112,9 @@ module "ecs" {
   fargate_cpu          = 512  # 0.5 vCPU - Better for production
   fargate_memory       = 1024 # 1GB memory - Better for production
   app_count            = 2    # Multiple instances for redundancy
+  superuser_username    = var.superuser_username
+  superuser_email       = var.superuser_email
+  superuser_password    = var.superuser_password
 }
 
 # Cloudflare DNS
