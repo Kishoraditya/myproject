@@ -117,7 +117,7 @@ module "ecs" {
 resource "cloudflare_record" "site_root" {
   zone_id = var.cloudflare_zone_id
   name    = "@"  # Root domain
-  value   = module.ecs.alb_dns_name
+  content   = module.ecs.alb_dns_name
   type    = "CNAME"
   ttl     = 1
   proxied = true
@@ -126,7 +126,7 @@ resource "cloudflare_record" "site_root" {
 resource "cloudflare_record" "site_www" {
   zone_id = var.cloudflare_zone_id
   name    = "www"
-  value   = module.ecs.alb_dns_name
+  content   = module.ecs.alb_dns_name
   type    = "CNAME"
   ttl     = 1
   proxied = true

@@ -47,7 +47,10 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "ecr:PutImage",
                 "ecr:CreateRepository",
                 "ecr:DescribeRepositories",
-                "ecr:DeleteRepository"
+                "ecr:DeleteRepository",
+                "ecr:TagResource",
+                "ecr:ListTagsForResource",
+                "ecr:UntagResource"
             ],
             "Resource": "*"
         },
@@ -63,7 +66,10 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "ecs:DescribeTaskDefinition",
                 "ecs:DescribeClusters",
                 "ecs:CreateCluster",
-                "ecs:DeleteCluster"
+                "ecs:DeleteCluster",
+                "ecs:TagResource",
+                "ecs:UntagResource",
+                "ecs:ListTagsForResource"
             ],
             "Resource": "*"
         },
@@ -82,7 +88,24 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "s3:GetBucketVersioning",
                 "s3:GetBucketPolicy",
                 "s3:PutBucketPolicy",
-                "s3:GetBucketPolicyStatus"
+                "s3:GetBucketPolicyStatus",
+                "s3:GetBucketTagging",
+                "s3:PutBucketTagging",
+                "s3:ListBucketVersions",
+                "s3:GetBucketAcl",
+                "s3:PutBucketAcl",
+                "s3:GetBucketCors",
+                "s3:PutBucketCors",
+                "s3:GetBucketLifecycleConfiguration",
+                "s3:PutBucketLifecycleConfiguration",
+                "s3:GetBucketLogging",
+                "s3:PutBucketLogging",
+                "s3:GetBucketRequestPayment",
+                "s3:PutBucketRequestPayment",
+                "s3:GetBucketWebsite",
+                "s3:PutBucketWebsite",
+                "s3:GetAccelerateConfiguration",
+                "s3:PutAccelerateConfiguration"
             ],
             "Resource": [
                 "arn:aws:s3:::terraform-state-myproject-*",
@@ -99,6 +122,8 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "cloudfront:UpdateDistribution",
                 "cloudfront:DeleteDistribution",
                 "cloudfront:TagResource",
+                "cloudfront:UntagResource",
+                "cloudfront:ListTagsForResource",
                 "cloudfront:CreateInvalidation"
             ],
             "Resource": "*"
@@ -115,7 +140,10 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "rds:DescribeDBSubnetGroups",
                 "rds:CreateDBParameterGroup",
                 "rds:DeleteDBParameterGroup",
-                "rds:ModifyDBParameterGroup"
+                "rds:ModifyDBParameterGroup",
+                "rds:AddTagsToResource",
+                "rds:RemoveTagsFromResource",
+                "rds:ListTagsForResource"
             ],
             "Resource": "*"
         },
@@ -125,6 +153,10 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "ec2:DescribeVpcs",
                 "ec2:DescribeSubnets",
                 "ec2:DescribeSecurityGroups",
+                "ec2:DescribeAddresses",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DescribeRouteTables",
+                "ec2:DescribeInternetGateways",
                 "ec2:CreateSecurityGroup",
                 "ec2:DeleteSecurityGroup",
                 "ec2:AuthorizeSecurityGroupIngress",
@@ -145,7 +177,27 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "ec2:DetachInternetGateway",
                 "ec2:AllocateAddress",
                 "ec2:ReleaseAddress",
-                "ec2:CreateTags"
+                "ec2:CreateTags",
+                "ec2:DeleteTags",
+                "ec2:ModifyVpcAttribute",
+                "ec2:DescribeVpcAttribute",
+                "ec2:DescribeAddressesAttribute",
+                "ec2:DescribeNetworkAcls",
+                "ec2:DescribeVpcPeeringConnections",
+                "ec2:DescribeVpcEndpointServices",
+                "ec2:DescribeVpcEndpoints",
+                "ec2:DescribeVpcClassicLink",
+                "ec2:DescribeVpcClassicLinkDnsSupport",
+                "ec2:DescribeVpcClassicLinkAttachments",
+                "ec2:DescribeVpcEndpointConnectionNotifications",
+                "ec2:DescribeVpcEndpointConnections",
+                "ec2:DescribeVpcEndpointServiceConfigurations",
+                "ec2:DescribeVpcEndpointServicePermissions",
+                "ec2:DescribeVpcEndpointServices",
+                "ec2:DescribeVpcEndpoints",
+                "ec2:DescribeVpcPeeringConnections",
+                "ec2:DescribeVpcAttribute",
+                "ec2:DescribeAddressesAttribute"
             ],
             "Resource": "*"
         },
@@ -162,7 +214,10 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "elasticloadbalancing:CreateRule",
                 "elasticloadbalancing:DeleteRule",
                 "elasticloadbalancing:CreateListener",
-                "elasticloadbalancing:DeleteListener"
+                "elasticloadbalancing:DeleteListener",
+                "elasticloadbalancing:AddTags",
+                "elasticloadbalancing:RemoveTags",
+                "elasticloadbalancing:DescribeTags"
             ],
             "Resource": "*"
         },
@@ -172,7 +227,10 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "logs:CreateLogGroup",
                 "logs:DeleteLogGroup",
                 "logs:PutRetentionPolicy",
-                "logs:DescribeLogGroups"
+                "logs:DescribeLogGroups",
+                "logs:TagResource",
+                "logs:UntagResource",
+                "logs:ListTagsLogGroup"
             ],
             "Resource": "*"
         },
@@ -182,7 +240,9 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "acm:RequestCertificate",
                 "acm:DeleteCertificate",
                 "acm:DescribeCertificate",
-                "acm:AddTagsToCertificate"
+                "acm:AddTagsToCertificate",
+                "acm:RemoveTagsFromCertificate",
+                "acm:ListTagsForCertificate"
             ],
             "Resource": "*"
         },
@@ -196,9 +256,15 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "iam:AttachRolePolicy",
                 "iam:DetachRolePolicy",
                 "iam:PutRolePolicy",
-                "iam:DeleteRolePolicy"
+                "iam:DeleteRolePolicy",
+                "iam:TagRole",
+                "iam:UntagRole",
+                "iam:ListRoleTags"
             ],
-            "Resource": "*"
+            "Resource": [
+                "arn:aws:iam::*:role/*",
+                "arn:aws:iam::*:role/*/*"
+            ]
         },
         {
             "Effect": "Allow",
@@ -208,13 +274,24 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "secretsmanager:GetSecretValue",
                 "secretsmanager:PutSecretValue",
                 "secretsmanager:UpdateSecret",
-                "secretsmanager:TagResource"
+                "secretsmanager:TagResource",
+                "secretsmanager:UntagResource",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:PutResourcePolicy",
+                "secretsmanager:DeleteResourcePolicy",
+                "secretsmanager:ListSecrets",
+                "secretsmanager:ListSecretVersionIds",
+                "secretsmanager:GetSecretPolicy",
+                "secretsmanager:PutSecretPolicy",
+                "secretsmanager:DeleteSecretPolicy"
             ],
             "Resource": "*"
         }
     ]
 }
 ```
+
 
 3. Name the policy (e.g., "GitHubActionsDeploymentPolicy") and create it
 4. Go back to the role creation process and attach the newly created policy
@@ -267,4 +344,189 @@ If you still encounter issues:
 1. Limit the IAM role permissions to only what's needed
 2. Use branch or environment conditions in the role's trust policy
 3. Regularly audit and update the permissions
-4. Consider using separate roles for different environments 
+4. Consider using separate roles for different environments
+
+## 9. Managing IAM Policies with Terraform
+
+For better control and versioning of IAM policies, consider managing them through Terraform:
+
+1. Create a Terraform configuration file for IAM:
+
+```hcl
+# iam.tf
+resource "aws_iam_role" "github_actions" {
+  name = "GitHubActionsRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${var.aws_account_id}:oidc-provider/token.actions.githubusercontent.com"
+        }
+        Condition = {
+          StringLike = {
+            "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:*"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "github_actions" {
+  name = "GitHubActionsDeploymentPolicy"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      # ECR permissions
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload",
+          "ecr:PutImage",
+          "ecr:CreateRepository",
+          "ecr:DescribeRepositories",
+          "ecr:DeleteRepository",
+          "ecr:TagResource",
+          "ecr:ListTagsForResource",
+          "ecr:UntagResource"
+        ]
+        Resource = "*"
+      },
+      # S3 permissions
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:CreateBucket",
+          "s3:PutBucketVersioning",
+          "s3:PutBucketEncryption",
+          "s3:PutBucketPublicAccessBlock",
+          "s3:GetEncryptionConfiguration",
+          "s3:GetBucketVersioning",
+          "s3:GetBucketPolicy",
+          "s3:PutBucketPolicy",
+          "s3:GetBucketPolicyStatus",
+          "s3:GetBucketTagging",
+          "s3:PutBucketTagging",
+          "s3:ListBucketVersions",
+          "s3:GetBucketAcl",
+          "s3:PutBucketAcl"
+        ]
+        Resource = [
+          "arn:aws:s3:::terraform-state-myproject-*",
+          "arn:aws:s3:::terraform-state-myproject-*/*",
+          "arn:aws:s3:::*-wagtail-app-static",
+          "arn:aws:s3:::*-wagtail-app-static/*"
+        ]
+      },
+      # EC2 permissions
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeVpcs",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeAddresses",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeRouteTables",
+          "ec2:DescribeInternetGateways",
+          "ec2:CreateSecurityGroup",
+          "ec2:DeleteSecurityGroup",
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupIngress",
+          "ec2:CreateVpc",
+          "ec2:DeleteVpc",
+          "ec2:CreateSubnet",
+          "ec2:DeleteSubnet",
+          "ec2:CreateRoute",
+          "ec2:DeleteRoute",
+          "ec2:CreateRouteTable",
+          "ec2:DeleteRouteTable",
+          "ec2:AssociateRouteTable",
+          "ec2:DisassociateRouteTable",
+          "ec2:CreateInternetGateway",
+          "ec2:DeleteInternetGateway",
+          "ec2:AttachInternetGateway",
+          "ec2:DetachInternetGateway",
+          "ec2:AllocateAddress",
+          "ec2:ReleaseAddress",
+          "ec2:CreateTags",
+          "ec2:DeleteTags",
+          "ec2:ModifyVpcAttribute",
+          "ec2:DescribeVpcAttribute",
+          "ec2:DescribeAddressesAttribute"
+        ]
+        Resource = "*"
+      },
+      # Secrets Manager permissions
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:CreateSecret",
+          "secretsmanager:DeleteSecret",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:PutSecretValue",
+          "secretsmanager:UpdateSecret",
+          "secretsmanager:TagResource",
+          "secretsmanager:UntagResource",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:GetResourcePolicy",
+          "secretsmanager:PutResourcePolicy",
+          "secretsmanager:DeleteResourcePolicy"
+        ]
+        Resource = "*"
+      }
+      # Add other permission blocks as needed
+    ]
+  })
+}
+```
+
+2. Use variables for environment-specific values:
+
+```hcl
+# variables.tf
+variable "aws_account_id" {
+  description = "AWS Account ID"
+  type        = string
+}
+
+variable "github_org" {
+  description = "GitHub organization or username"
+  type        = string
+}
+
+variable "github_repo" {
+  description = "GitHub repository name"
+  type        = string
+}
+```
+
+3. Apply the Terraform configuration:
+
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+This approach provides several benefits:
+- Version control for your IAM policies
+- Consistent policy application across environments
+- Easier policy updates and rollbacks
+- Better security through least privilege principles 
