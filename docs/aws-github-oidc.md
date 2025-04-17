@@ -30,7 +30,6 @@ Instead of attaching multiple managed policies that may exceed the limit, create
 1. In the role creation process, select "Create policy"
 2. Use the JSON editor and paste the following policy:
 
-```json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -50,7 +49,9 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "ecr:DeleteRepository",
                 "ecr:TagResource",
                 "ecr:ListTagsForResource",
-                "ecr:UntagResource"
+                "ecr:UntagResource",
+                "ecr:GetLifecyclePolicy",
+                "ecr:PutLifecyclePolicy"
             ],
             "Resource": "*"
         },
@@ -82,7 +83,7 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "s3:DeleteObject",
                 "s3:CreateBucket",
                 "s3:PutBucketVersioning",
-                "s3:PutBucketEncryption",
+                "s3:PutEncryptionConfiguration",
                 "s3:PutBucketPublicAccessBlock",
                 "s3:GetEncryptionConfiguration",
                 "s3:GetBucketVersioning",
@@ -96,8 +97,6 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "s3:PutBucketAcl",
                 "s3:GetBucketCors",
                 "s3:PutBucketCors",
-                "s3:GetBucketLifecycleConfiguration",
-                "s3:PutBucketLifecycleConfiguration",
                 "s3:GetBucketLogging",
                 "s3:PutBucketLogging",
                 "s3:GetBucketRequestPayment",
@@ -105,12 +104,14 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "s3:GetBucketWebsite",
                 "s3:PutBucketWebsite",
                 "s3:GetAccelerateConfiguration",
-                "s3:PutAccelerateConfiguration"
+                "s3:PutAccelerateConfiguration",
+                "s3:GetLifecycleConfiguration",
+                "s3:PutLifecycleConfiguration"
             ],
             "Resource": [
                 "arn:aws:s3:::terraform-state-myproject-*",
-                "arn:aws:s3:::terraform-state-myproject-*/*",
                 "arn:aws:s3:::*-wagtail-app-static",
+                "arn:aws:s3:::terraform-state-myproject-*/*",
                 "arn:aws:s3:::*-wagtail-app-static/*"
             ]
         },
@@ -141,6 +142,7 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "rds:CreateDBParameterGroup",
                 "rds:DeleteDBParameterGroup",
                 "rds:ModifyDBParameterGroup",
+                "rds:DescribeDBParameterGroups",
                 "rds:AddTagsToResource",
                 "rds:RemoveTagsFromResource",
                 "rds:ListTagsForResource"
@@ -154,6 +156,7 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "ec2:DescribeSubnets",
                 "ec2:DescribeSecurityGroups",
                 "ec2:DescribeAddresses",
+                "ec2:DescribeAddressesAttribute",
                 "ec2:DescribeNetworkInterfaces",
                 "ec2:DescribeRouteTables",
                 "ec2:DescribeInternetGateways",
@@ -181,23 +184,12 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "ec2:DeleteTags",
                 "ec2:ModifyVpcAttribute",
                 "ec2:DescribeVpcAttribute",
-                "ec2:DescribeAddressesAttribute",
                 "ec2:DescribeNetworkAcls",
                 "ec2:DescribeVpcPeeringConnections",
                 "ec2:DescribeVpcEndpointServices",
                 "ec2:DescribeVpcEndpoints",
                 "ec2:DescribeVpcClassicLink",
-                "ec2:DescribeVpcClassicLinkDnsSupport",
-                "ec2:DescribeVpcClassicLinkAttachments",
-                "ec2:DescribeVpcEndpointConnectionNotifications",
-                "ec2:DescribeVpcEndpointConnections",
-                "ec2:DescribeVpcEndpointServiceConfigurations",
-                "ec2:DescribeVpcEndpointServicePermissions",
-                "ec2:DescribeVpcEndpointServices",
-                "ec2:DescribeVpcEndpoints",
-                "ec2:DescribeVpcPeeringConnections",
-                "ec2:DescribeVpcAttribute",
-                "ec2:DescribeAddressesAttribute"
+                "ec2:DescribeVpcClassicLinkDnsSupport"
             ],
             "Resource": "*"
         },
@@ -207,10 +199,12 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "elasticloadbalancing:CreateLoadBalancer",
                 "elasticloadbalancing:DeleteLoadBalancer",
                 "elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeLoadBalancerAttributes",
                 "elasticloadbalancing:ModifyLoadBalancerAttributes",
                 "elasticloadbalancing:CreateTargetGroup",
                 "elasticloadbalancing:DeleteTargetGroup",
                 "elasticloadbalancing:DescribeTargetGroups",
+                "elasticloadbalancing:DescribeTargetGroupAttributes",
                 "elasticloadbalancing:CreateRule",
                 "elasticloadbalancing:DeleteRule",
                 "elasticloadbalancing:CreateListener",
@@ -230,7 +224,8 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "logs:DescribeLogGroups",
                 "logs:TagResource",
                 "logs:UntagResource",
-                "logs:ListTagsLogGroup"
+                "logs:ListTagsLogGroup",
+                "logs:ListTagsForResource"
             ],
             "Resource": "*"
         },
@@ -252,7 +247,8 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "iam:CreateRole",
                 "iam:DeleteRole",
                 "iam:GetRole",
-                "iam:PassRole",
+                "iam:ListRolePolicies",
+                "iam:GetRolePolicy",
                 "iam:AttachRolePolicy",
                 "iam:DetachRolePolicy",
                 "iam:PutRolePolicy",
@@ -261,10 +257,24 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "iam:UntagRole",
                 "iam:ListRoleTags"
             ],
-            "Resource": [
-                "arn:aws:iam::*:role/*",
-                "arn:aws:iam::*:role/*/*"
-            ]
+            "Resource": "arn:aws:iam::*:role/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::*:role/*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:PassedToService": [
+                        "ecs.amazonaws.com",
+                        "ecs-tasks.amazonaws.com",
+                        "rds.amazonaws.com",
+                        "ec2.amazonaws.com",
+                        "elasticloadbalancing.amazonaws.com",
+                        "logs.amazonaws.com"
+                    ]
+                }
+            }
         },
         {
             "Effect": "Allow",
@@ -281,17 +291,12 @@ Instead of attaching multiple managed policies that may exceed the limit, create
                 "secretsmanager:PutResourcePolicy",
                 "secretsmanager:DeleteResourcePolicy",
                 "secretsmanager:ListSecrets",
-                "secretsmanager:ListSecretVersionIds",
-                "secretsmanager:GetSecretPolicy",
-                "secretsmanager:PutSecretPolicy",
-                "secretsmanager:DeleteSecretPolicy"
+                "secretsmanager:ListSecretVersionIds"
             ],
             "Resource": "*"
         }
     ]
 }
-```
-
 
 3. Name the policy (e.g., "GitHubActionsDeploymentPolicy") and create it
 4. Go back to the role creation process and attach the newly created policy

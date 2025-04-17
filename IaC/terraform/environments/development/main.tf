@@ -131,3 +131,21 @@ resource "cloudflare_record" "apex" {
   proxied = true
 }
 
+
+# GitHub Actions IAM Role and Policy
+module "github_actions_iam" {
+  source = "../../modules/iam"
+  
+  environment = "dev"
+  github_org  = "Kishoraditya"
+  github_repo = "myproject"
+}
+
+output "github_actions_role_arn" {
+  value = module.github_actions_iam.github_actions_role_arn
+}
+
+output "github_actions_role_name" {
+  value = module.github_actions_iam.github_actions_role_name
+}
+
