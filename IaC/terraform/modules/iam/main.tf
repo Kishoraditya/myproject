@@ -1,12 +1,29 @@
 # OIDC Provider for GitHub Actions
 
-# Replace the resource with a data source
-# Use data source instead of resource for OIDC provider
-data "aws_iam_openid_connect_provider" "github_actions" {
-  url = "https://token.actions.githubusercontent.com"
+# Create the OIDC provider only in the production environment
+resource "aws_iam_openid_connect_provider" "github_actions" {
+  # Only create this resource if the environment is "prod"
+  count = var.environment == "prod" ? 1 : 0
+  
+  url             = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+  
+  lifecycle {
+    # Prevent destruction of the OIDC provider
+    prevent_destroy = true
+    ignore_changes = [thumbprint_list]
+  }
 }
 
-# Rest of the file remains the same
+# Use a data source to reference the OIDC provider in all environments
+data "aws_iam_openid_connect_provider" "github_actions" {
+  # Skip this data source if we're creating the resource (in prod)
+  count = var.environment == "prod" ? 0 : 1
+  url   = "https://token.actions.githubusercontent.com"
+}
+
+# IAM Role for GitHub Actions
 resource "aws_iam_role" "github_actions" {
   name = "GitHubActionsRole-${title(var.environment)}"
   
@@ -17,7 +34,7 @@ resource "aws_iam_role" "github_actions" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Effect = "Allow"
         Principal = {
-          Federated = data.aws_iam_openid_connect_provider.github_actions.arn
+          Federated = var.environment == "prod" ? aws_iam_openid_connect_provider.github_actions[0].arn : data.aws_iam_openid_connect_provider.github_actions[0].arn
         }
         Condition = {
           StringEquals = {
