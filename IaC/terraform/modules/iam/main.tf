@@ -129,7 +129,11 @@ resource "aws_iam_role_policy" "github_actions" {
           "s3:GetBucketWebsite",
           "s3:PutBucketWebsite",
           "s3:GetAccelerateConfiguration",
-          "s3:PutAccelerateConfiguration"
+          "s3:PutAccelerateConfiguration",
+          "s3:GetReplicationConfiguration",  # Add this line
+          "s3:PutReplicationConfiguration",  # Add this line
+          "s3:GetBucketReplication",         # Add this line
+          "s3:PutBucketReplication" 
         ]
         Resource = [
           "arn:aws:s3:::terraform-state-myproject-*",
