@@ -1,12 +1,14 @@
 # OIDC Provider for GitHub Actions
+
+
 resource "aws_iam_openid_connect_provider" "github_actions" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]  # GitHub's thumbprint
+  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
   
-  # Add lifecycle block to prevent destruction
+  # This prevents recreation if the thumbprint changes
   lifecycle {
-    prevent_destroy = true
+    ignore_changes = [thumbprint_list]
   }
 }
 
@@ -116,6 +118,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "s3:PutBucketAcl",
           "s3:GetBucketCors",
           "s3:PutBucketCors",
+          "s3:GetLifecycleConfiguration",     # Add this line
+          "s3:PutLifecycleConfiguration", 
           "s3:GetBucketLifecycleConfiguration",
           "s3:PutBucketLifecycleConfiguration",
           "s3:GetBucketLogging",
@@ -229,6 +233,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "elasticloadbalancing:CreateListener",
           "elasticloadbalancing:DeleteListener",
           "elasticloadbalancing:DescribeListeners",
+          "elasticloadbalancing:DescribeListenerAttributes",
+          "elasticloadbalancing:ModifyListener",
           "elasticloadbalancing:DescribeRules",
           "elasticloadbalancing:AddTags",
           "elasticloadbalancing:RemoveTags",
