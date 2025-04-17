@@ -5,9 +5,9 @@ resource "random_string" "secret_suffix" {
 }
 
 resource "aws_secretsmanager_secret" "app_secrets" {
-  name        = "${var.environment}/${var.app_name}/secrets_3${formatdate("YYYYMMDD", timestamp())}_${random_string.secret_suffix.result}"
+  name        = "${var.environment}/${var.app_name}/secrets_${formatdate("YYYYMMDD", timestamp())}_${random_string.secret_suffix.result}"
   description = "Secrets for the ${var.app_name} application in ${var.environment} environment"
-  
+  recovery_window_in_days = 0
   tags = {
     Environment = var.environment
     Application = var.app_name
