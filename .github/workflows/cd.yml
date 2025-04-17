@@ -111,7 +111,7 @@ jobs:
           file: IaC/docker/Dockerfile.prod
           push: true
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ steps.env-vars.outputs.tf_workspace }}-${{ var.app_name }}:${{ steps.env-vars.outputs.image_tag }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ steps.env-vars.outputs.tf_workspace }}-wagtail-app:${{ steps.env-vars.outputs.image_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
