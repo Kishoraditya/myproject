@@ -134,13 +134,16 @@ resource "aws_iam_role_policy" "github_actions" {
           "s3:PutReplicationConfiguration",  # Add this line
           "s3:GetBucketReplication",         # Add this line
           "s3:PutBucketReplication",
+          "s3:GetBucketOwnershipControls",
+          "s3:GetBucketPublicAccessBlock",
           "s3:GetBucketObjectLockConfiguration"
         ]
         Resource = [
           "arn:aws:s3:::terraform-state-myproject-*",
           "arn:aws:s3:::terraform-state-myproject-*/*",
           "arn:aws:s3:::*-wagtail-app-static",
-          "arn:aws:s3:::*-wagtail-app-static/*"
+          "arn:aws:s3:::*-wagtail-app-static/*",
+          "arn:aws:s3:::prod-wagtail-app-static"
         ]
       },
       # CloudFront permissions
