@@ -12,7 +12,7 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
 
 # IAM Role for GitHub Actions
 resource "aws_iam_role" "github_actions" {
-  name = var.environment == "prod" ? "GitHubActionsRole-Production" : "GitHubActionsRole-${title(var.environment)}"
+  name = "GitHubActionsRole-${title(var.environment)}"
   
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -102,7 +102,7 @@ resource "aws_iam_role_policy" "github_actions" {
           "s3:DeleteObject",
           "s3:CreateBucket",
           "s3:PutBucketVersioning",
-          "s3:PutBucketEncryption",
+          "s3:PutEncryptionConfiguration",
           "s3:PutBucketPublicAccessBlock",
           "s3:GetEncryptionConfiguration",
           "s3:GetBucketVersioning",
@@ -164,6 +164,7 @@ resource "aws_iam_role_policy" "github_actions" {
           "rds:DeleteDBParameterGroup",
           "rds:ModifyDBParameterGroup",
           "rds:DescribeDBParameterGroups",
+          "rds:DescribeDBParameters",
           "rds:AddTagsToResource",
           "rds:RemoveTagsFromResource",
           "rds:ListTagsForResource"
@@ -181,6 +182,7 @@ resource "aws_iam_role_policy" "github_actions" {
           "ec2:DescribeNetworkInterfaces",
           "ec2:DescribeRouteTables",
           "ec2:DescribeInternetGateways",
+          "ec2:DescribeNatGateways",
           "ec2:CreateSecurityGroup",
           "ec2:DeleteSecurityGroup",
           "ec2:AuthorizeSecurityGroupIngress",
@@ -226,6 +228,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "elasticloadbalancing:DeleteRule",
           "elasticloadbalancing:CreateListener",
           "elasticloadbalancing:DeleteListener",
+          "elasticloadbalancing:DescribeListeners",
+          "elasticloadbalancing:DescribeRules",
           "elasticloadbalancing:AddTags",
           "elasticloadbalancing:RemoveTags",
           "elasticloadbalancing:DescribeTags"
@@ -274,13 +278,16 @@ resource "aws_iam_role_policy" "github_actions" {
           "iam:DeleteRolePolicy",
           "iam:ListRolePolicies",
           "iam:GetRolePolicy",
+          "iam:ListAttachedRolePolicies",
+          "iam:GetOpenIDConnectProvider",
           "iam:TagRole",
           "iam:UntagRole",
           "iam:ListRoleTags"
         ]
         Resource = [
           "arn:aws:iam::*:role/*",
-          "arn:aws:iam::*:role/*/*"
+          "arn:aws:iam::*:role/*/*",
+          "arn:aws:iam::*:oidc-provider/token.actions.githubusercontent.com"
         ]
       },
       # Secrets Manager permissions
@@ -306,3 +313,4 @@ resource "aws_iam_role_policy" "github_actions" {
     ]
   })
 }
+

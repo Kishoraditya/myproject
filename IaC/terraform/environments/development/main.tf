@@ -120,6 +120,7 @@ resource "cloudflare_record" "site" {
   type    = "CNAME"
   ttl     = 1
   proxied = true
+  allow_overwrite = true  # Add this line to allow overwriting existing records
 } 
 
 resource "cloudflare_record" "apex" {

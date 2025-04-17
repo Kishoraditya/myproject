@@ -1,5 +1,11 @@
+resource "random_string" "secret_suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 resource "aws_secretsmanager_secret" "app_secrets" {
-  name        = "${var.environment}/${var.app_name}/secrets_3"
+  name        = "${var.environment}/${var.app_name}/secrets_${formatdate("YYYYMMDD", timestamp())}_${random_string.secret_suffix.result}"
   description = "Secrets for the ${var.app_name} application in ${var.environment} environment"
   
   tags = {
