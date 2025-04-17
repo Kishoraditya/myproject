@@ -1,18 +1,12 @@
 # OIDC Provider for GitHub Actions
 
-
-resource "aws_iam_openid_connect_provider" "github_actions" {
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
-  
-  # This prevents recreation if the thumbprint changes
-  lifecycle {
-    ignore_changes = [thumbprint_list]
-  }
+# Replace the resource with a data source
+# Use data source instead of resource for OIDC provider
+data "aws_iam_openid_connect_provider" "github_actions" {
+  url = "https://token.actions.githubusercontent.com"
 }
 
-# IAM Role for GitHub Actions
+# Rest of the file remains the same
 resource "aws_iam_role" "github_actions" {
   name = "GitHubActionsRole-${title(var.environment)}"
   
@@ -23,7 +17,7 @@ resource "aws_iam_role" "github_actions" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Effect = "Allow"
         Principal = {
-          Federated = aws_iam_openid_connect_provider.github_actions.arn
+          Federated = data.aws_iam_openid_connect_provider.github_actions.arn
         }
         Condition = {
           StringEquals = {
