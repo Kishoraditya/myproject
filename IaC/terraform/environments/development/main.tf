@@ -69,6 +69,7 @@ module "secrets" {
   db_password           = var.db_password
   aws_access_key_id     = var.aws_access_key_id
   aws_secret_access_key = var.aws_secret_access_key
+  superuser_password    = var.superuser_password
 }
 
 # RDS Database
@@ -110,6 +111,9 @@ module "ecs" {
   acm_certificate_arn = var.acm_certificate_arn
   fargate_cpu          = 256  # 0.25 vCPU - Free tier eligible
   fargate_memory       = 512  # Free tier eligible
+  superuser_username    = var.superuser_username
+  superuser_email       = var.superuser_email
+  superuser_password    = var.superuser_password
 }
 
 # Cloudflare DNS
