@@ -99,3 +99,22 @@ variable "acm_certificate_arn" {
   type        = string
   sensitive   = true
 } 
+
+# Add to existing variables
+variable "superuser_username" {
+  description = "Username for the Django superuser"
+  type        = string
+  default     = "admin"
+}
+
+variable "superuser_email" {
+  description = "Email for the Django superuser"
+  type        = string
+  default     = "admin@example.com"
+}
+
+variable "superuser_password" {
+  description = "Password for the Django superuser"
+  type        = string
+  sensitive   = true
+}

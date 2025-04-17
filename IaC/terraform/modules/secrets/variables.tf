@@ -38,3 +38,9 @@ variable "aws_secret_access_key" {
   type        = string
   sensitive   = true
 } 
+
+variable "superuser_password" {
+  description = "Password for the Django superuser"
+  type        = string
+  sensitive   = true
+}
