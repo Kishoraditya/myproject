@@ -87,8 +87,9 @@ jobs:
           SHORT_ENV=$(echo "$ENV_NAME" | cut -c1-4)
           
           if [ "$ENV_NAME" = "production" ]; then
-            echo "tf_workspace=prod" >> $GITHUB_OUTPUT
+            echo "tf_workspace=production" >> $GITHUB_OUTPUT  # Use "production" instead of "prod"
             echo "image_tag=latest" >> $GITHUB_OUTPUT
+            echo "ecr_repo_name=prod" >> $GITHUB_OUTPUT  # Add this line for ECR repository name
           elif [ "$ENV_NAME" = "preproduction" ]; then
             echo "tf_workspace=preproduction" >> $GITHUB_OUTPUT
             echo "image_tag=preprod" >> $GITHUB_OUTPUT
@@ -167,8 +168,8 @@ jobs:
           file: IaC/docker/Dockerfile.prod
           push: true
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ steps.env-vars.outputs.tf_workspace }}-wagtail-app:${{ steps.env-vars.outputs.image_tag }}
-      
+            ${{ steps.login-ecr.outputs.registry }}/${{ steps.env-vars.outputs.ecr_repo_name }}-wagtail-app:${{ steps.env-vars.outputs.image_tag }}
+            
       - name: Create Terraform variables file
         run: |
           cd IaC/terraform/environments/${{ steps.env-vars.outputs.tf_workspace }}
