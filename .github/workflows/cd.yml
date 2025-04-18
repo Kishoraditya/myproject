@@ -87,7 +87,7 @@ jobs:
           SHORT_ENV=$(echo "$ENV_NAME" | cut -c1-4)
           
           if [ "$ENV_NAME" = "production" ]; then
-            echo "tf_workspace=production" >> $GITHUB_OUTPUT
+            echo "tf_workspace=prod" >> $GITHUB_OUTPUT
             echo "image_tag=latest" >> $GITHUB_OUTPUT
           elif [ "$ENV_NAME" = "preproduction" ]; then
             echo "tf_workspace=preproduction" >> $GITHUB_OUTPUT
@@ -96,7 +96,7 @@ jobs:
             echo "tf_workspace=testing" >> $GITHUB_OUTPUT
             echo "image_tag=test" >> $GITHUB_OUTPUT
           else
-            echo "tf_workspace=development" >> $GITHUB_OUTPUT
+            echo "tf_workspace=dev" >> $GITHUB_OUTPUT
             echo "image_tag=develop-latest" >> $GITHUB_OUTPUT
           fi
 
