@@ -73,6 +73,7 @@ jobs:
       
       - name: Create Terraform state bucket if it doesn't exist
         run: |
+          echo "Environment: ${{ needs.determine_environment.outputs.environment }}"
           if [ "${{ needs.determine_environment.outputs.environment }}" = "production" ]; then
             ENV_SHORT="prod"
           elif [ "${{ needs.determine_environment.outputs.environment }}" = "preproduction" ]; then
@@ -82,6 +83,7 @@ jobs:
           else
             ENV_SHORT="deve"
           fi
+          echo "ENV_SHORT: $ENV_SHORT"
           ./IaC/scripts/create-tf-state-bucket.sh -b terraform-state-myproject-$ENV_SHORT -r us-east-1
           aws s3 ls | grep terraform-state-myproject-$ENV_NAME
 
