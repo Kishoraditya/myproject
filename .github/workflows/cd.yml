@@ -100,6 +100,56 @@ jobs:
             echo "image_tag=develop-latest" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check for .dockerignore
+        run: |
+          if [ -f .dockerignore ]; then
+            echo "Found .dockerignore file, checking content:"
+            cat .dockerignore
+            echo "Creating a valid .dockerignore file"
+            cat > .dockerignore << 'EOF'
+          # Valid .dockerignore file
+          .git
+          .github
+          .gitignore
+          .env*
+          *.pyc
+          __pycache__
+          *.pyo
+          *.pyd
+          .Python
+          env/
+          venv/
+          ENV/
+          env.bak/
+          venv.bak/
+          .vscode/
+          *.swp
+          *.swo
+          EOF
+          else
+            echo "No .dockerignore file found, creating one"
+            cat > .dockerignore << 'EOF'
+          # Valid .dockerignore file
+          .git
+          .github
+          .gitignore
+          .env*
+          *.pyc
+          __pycache__
+          *.pyo
+          *.pyd
+          .Python
+          env/
+          venv/
+          ENV/
+          env.bak/
+          venv.bak/
+          .vscode/
+          *.swp
+          *.swo
+          EOF
+              fi
+
         # Add these steps after the "Login to Amazon ECR" step
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
