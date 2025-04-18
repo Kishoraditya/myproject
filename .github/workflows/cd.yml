@@ -73,19 +73,18 @@ jobs:
       
       - name: Create Terraform state bucket if it doesn't exist
         run: |
-          run: |
-            if [ "${{ needs.determine_environment.outputs.environment }}" = "production" ]; then
-              ENV_SHORT="prod"
-            elif [ "${{ needs.determine_environment.outputs.environment }}" = "preproduction" ]; then
-              ENV_SHORT="preprod"
-            elif [ "${{ needs.determine_environment.outputs.environment }}" = "testing" ]; then
-              ENV_SHORT="test"
-            else
-              ENV_SHORT="deve"
-            fi
-            ./IaC/scripts/create-tf-state-bucket.sh -b terraform-state-myproject-$ENV_SHORT -r us-east-1
-            aws s3 ls | grep terraform-state-myproject-$ENV_NAME
-            
+          if [ "${{ needs.determine_environment.outputs.environment }}" = "production" ]; then
+            ENV_SHORT="prod"
+          elif [ "${{ needs.determine_environment.outputs.environment }}" = "preproduction" ]; then
+            ENV_SHORT="preprod"
+          elif [ "${{ needs.determine_environment.outputs.environment }}" = "testing" ]; then
+            ENV_SHORT="test"
+          else
+            ENV_SHORT="deve"
+          fi
+          ./IaC/scripts/create-tf-state-bucket.sh -b terraform-state-myproject-$ENV_SHORT -r us-east-1
+          aws s3 ls | grep terraform-state-myproject-$ENV_NAME
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
