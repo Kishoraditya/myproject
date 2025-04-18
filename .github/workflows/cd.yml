@@ -92,13 +92,16 @@ jobs:
             echo "ecr_repo_name=prod" >> $GITHUB_OUTPUT  # Add this line for ECR repository name
           elif [ "$ENV_NAME" = "preproduction" ]; then
             echo "tf_workspace=preproduction" >> $GITHUB_OUTPUT
-            echo "image_tag=preprod" >> $GITHUB_OUTPUT
+            echo "image_tag=latest" >> $GITHUB_OUTPUT
+            echo "ecr_repo_name=preprod" >> $GITHUB_OUTPUT
           elif [ "$ENV_NAME" = "testing" ]; then
             echo "tf_workspace=testing" >> $GITHUB_OUTPUT
-            echo "image_tag=test" >> $GITHUB_OUTPUT
+            echo "image_tag=latest" >> $GITHUB_OUTPUT
+            echo "ecr_repo_name=test" >> $GITHUB_OUTPUT
           else
-            echo "tf_workspace=dev" >> $GITHUB_OUTPUT
-            echo "image_tag=develop-latest" >> $GITHUB_OUTPUT
+            echo "tf_workspace=development" >> $GITHUB_OUTPUT
+            echo "image_tag=latest" >> $GITHUB_OUTPUT
+            echo "ecr_repo_name=dev" >> $GITHUB_OUTPUT
           fi
 
       - name: Check for .dockerignore
