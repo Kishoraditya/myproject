@@ -1,5 +1,7 @@
 # OIDC Provider for GitHub Actions
 
+# OIDC Provider for GitHub Actions
+
 # Create the OIDC provider only in the production environment
 resource "aws_iam_openid_connect_provider" "github_actions" {
   # Only create this resource if the environment is "prod"
@@ -53,6 +55,9 @@ resource "aws_iam_role" "github_actions" {
     Terraform   = "true"
   }
 }
+
+# Rest of your IAM role policy configuration remains the same
+
 
 # IAM Policy for GitHub Actions
 resource "aws_iam_role_policy" "github_actions" {
