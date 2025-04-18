@@ -312,6 +312,7 @@ resource "aws_iam_role_policy" "github_actions" {
           "iam:GetRolePolicy",
           "iam:ListAttachedRolePolicies",
           "iam:GetOpenIDConnectProvider",
+          "iam:ListOpenIDConnectProviders",
           "iam:TagRole",
           "iam:UntagRole",
           "iam:ListRoleTags"
