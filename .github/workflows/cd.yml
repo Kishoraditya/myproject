@@ -84,6 +84,7 @@ jobs:
               ENV_SHORT="deve"
             fi
             ./IaC/scripts/create-tf-state-bucket.sh -b terraform-state-myproject-$ENV_SHORT -r us-east-1
+            aws s3 ls | grep terraform-state-myproject-$ENV_NAME
             
       - name: Login to Amazon ECR
         id: login-ecr
