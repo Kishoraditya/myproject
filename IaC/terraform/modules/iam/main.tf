@@ -18,10 +18,28 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
   }
 }
 
+# Use a local value to determine the OIDC provider ARN
+# Use a local value to determine the OIDC provider ARN
+locals {
+  # For production, use the created resource
+  # For development, use a hardcoded ARN that references the production resource
+  # For other environments, use the data source
+  github_actions_provider_arn = var.environment == "prod" ? (
+    aws_iam_openid_connect_provider.github_actions[0].arn
+  ) : (
+    var.environment == "dev" ? (
+      "arn:aws:iam::888577065416:oidc-provider/token.actions.githubusercontent.com"
+    ) : (
+      (var.environment != "prod" && var.environment != "dev") ? (
+        data.aws_iam_openid_connect_provider.github_actions[0].arn
+      ) : ""
+    )
+  )
+}
+
 # Use a data source to reference the OIDC provider in all environments
 data "aws_iam_openid_connect_provider" "github_actions" {
-  # Skip this data source if we're creating the resource (in prod)
-  count = var.environment == "prod" ? 0 : 1
+  count = (var.environment != "prod" && var.environment != "dev") ? 1 : 0
   url   = "https://token.actions.githubusercontent.com"
 }
 
@@ -36,7 +54,7 @@ resource "aws_iam_role" "github_actions" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Effect = "Allow"
         Principal = {
-          Federated = var.environment == "prod" ? aws_iam_openid_connect_provider.github_actions[0].arn : data.aws_iam_openid_connect_provider.github_actions[0].arn
+          Federated = local.github_actions_provider_arn
         }
         Condition = {
           StringEquals = {
