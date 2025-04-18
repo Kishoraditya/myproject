@@ -6,6 +6,10 @@ resource "aws_db_subnet_group" "main" {
     Name        = "${var.environment}-db-subnet-group"
     Environment = var.environment
   }
+  lifecycle {
+    # Prevent Terraform from trying to modify subnet IDs
+    ignore_changes = [subnet_ids]
+  }
 }
 
 resource "aws_db_parameter_group" "postgres" {

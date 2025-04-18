@@ -18,7 +18,7 @@ terraform {
   }
   
   backend "s3" {
-    bucket = "my-demo-aws-bucket-number456"
+    bucket = "terraform-state-myproject-deve"
     key    = "terraform.tfstate"
     region = "us-east-1"
   }
@@ -134,6 +134,7 @@ resource "cloudflare_record" "apex" {
   type    = "CNAME"
   ttl     = 1
   proxied = true
+  allow_overwrite = true 
 }
 
 
