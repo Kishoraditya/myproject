@@ -152,9 +152,11 @@ resource "aws_iam_role_policy" "github_actions" {
           "s3:PutBucketReplication",
           "s3:GetBucketOwnershipControls",
           "s3:GetBucketPublicAccessBlock",
-          "s3:GetBucketObjectLockConfiguration"
+          "s3:GetBucketObjectLockConfiguration",
+          "s3:ListBuckets"
         ]
         Resource = [
+          "*",
           "arn:aws:s3:::terraform-state-myproject-*",
           "arn:aws:s3:::terraform-state-myproject-*/*",
           "arn:aws:s3:::*-wagtail-app-static",
