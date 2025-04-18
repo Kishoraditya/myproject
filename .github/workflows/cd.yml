@@ -120,7 +120,6 @@ jobs:
             ${{ steps.login-ecr.outputs.registry }}/${{ steps.env-vars.outputs.tf_workspace }}-wagtail-app:${{ steps.env-vars.outputs.image_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          timeout: 120m
 
       
       - name: Create Terraform variables file
