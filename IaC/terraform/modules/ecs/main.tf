@@ -132,6 +132,10 @@ resource "aws_alb" "main" {
   tags = {
     Environment = var.environment
   }
+  lifecycle {
+    # Prevent Terraform from trying to modify security groups if they're invalid
+    ignore_changes = [security_groups]
+  }
 }
 
 resource "aws_alb_target_group" "app" {
@@ -153,6 +157,12 @@ resource "aws_alb_target_group" "app" {
 
   tags = {
     Environment = var.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
+    # Prevent Terraform from trying to delete/recreate the target group
+    ignore_changes = [name]
   }
 }
 

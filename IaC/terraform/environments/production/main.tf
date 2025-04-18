@@ -135,6 +135,7 @@ resource "cloudflare_record" "site_www" {
   type    = "CNAME"
   ttl     = 1
   proxied = true
+  allow_overwrite = true
 }
 
 # GitHub Actions IAM Role and Policy
