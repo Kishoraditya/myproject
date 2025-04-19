@@ -247,7 +247,18 @@ jobs:
       - name: Update ECS service
         run: |
           ENV_NAME="${{ needs.determine_environment.outputs.environment }}"
-          SHORT_ENV=$(echo "$ENV_NAME" | cut -c1-4)
+          # Map full environment names to short names
+          if [ "$ENV_NAME" = "production" ]; then
+            SHORT_ENV="prod"
+          elif [ "$ENV_NAME" = "preproduction" ]; then
+            SHORT_ENV="preprod"
+          elif [ "$ENV_NAME" = "testing" ]; then
+            SHORT_ENV="test"
+          elif [ "$ENV_NAME" = "development" ]; then
+            SHORT_ENV="dev"
+          else
+            SHORT_ENV=$(echo "$ENV_NAME" | cut -c1-4)
+          fi
           
           aws ecs update-service --cluster $SHORT_ENV-cluster \
             --service $SHORT_ENV-wagtail-app \
