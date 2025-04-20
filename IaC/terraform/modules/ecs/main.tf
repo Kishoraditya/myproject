@@ -97,8 +97,8 @@ resource "aws_ecs_service" "main" {
 
   network_configuration {
     security_groups  = [var.ecs_security_group_id]
-    subnets          = var.private_subnet_ids
-    assign_public_ip = false
+    subnets          = var.environment == "dev" ? var.public_subnet_ids : var.private_subnet_ids
+    assign_public_ip = var.environment == "dev" ? true : false
   }
 
   load_balancer {
