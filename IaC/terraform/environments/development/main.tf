@@ -37,7 +37,7 @@ module "networking" {
   public_subnets       = var.public_subnets
   private_subnets      = var.private_subnets
   availability_zones   = var.availability_zones
-  create_nat_gateway   = false  # Save costs in dev
+  create_nat_gateway   = true
 }
 
 # ECR Repository
